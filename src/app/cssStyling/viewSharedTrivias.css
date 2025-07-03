@@ -1,0 +1,148 @@
+/* Container & Titles */
+.dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-title {
+  font-size: 2.4rem;
+  margin-bottom: 0.3rem;
+  text-align: center;
+}
+
+.dashboard-subtext {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #555;
+}
+
+.dashboard-back-button {
+  display: block;
+  margin: 0 auto 2rem auto;
+  background-color: #eaeaea;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.dashboard-back-button:hover {
+  background-color: #d6d6d6;
+}
+
+/* Trivia Card List */
+.shared-trivia-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Horizontal Card Styling */
+.trivia-card-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e1e1e1;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trivia-card-horizontal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Left Side of Card: Profile + Text */
+.trivia-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.trivia-text-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.trivia-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.sharer-username {
+  font-size: 0.9rem;
+  color: #777;
+  font-weight: 500;
+}
+
+/* Profile Pic */
+.sharer-profile-pic {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.sharer-profile-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #bbb;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* Right Side: Buttons */
+.trivia-right {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.rounded-btn {
+  padding: 0.4rem 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.rounded-btn.play {
+  background-color: #4caf50;
+  color: white;
+}
+
+.rounded-btn.play:hover {
+  background-color: #43a047;
+}
+
+.rounded-btn.delete {
+  background-color: #f44336;
+  color: white;
+}
+
+.rounded-btn.delete:hover {
+  background-color: #d32f2f;
+}

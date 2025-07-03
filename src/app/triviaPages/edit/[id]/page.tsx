@@ -212,7 +212,14 @@ export default function EditTrivia() {
         setConfirmSubmitOpen(true);
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) {
+        return (
+            <div className="edit-container loading-spinner-container">
+                <div className="spinner" />
+                <p className="loading-text">Finalizing your trivia...</p>
+            </div>
+        );
+    }
     if (error || !trivia) return <p>Error: {error || 'Not found'}</p>;
 
     return (
@@ -383,19 +390,21 @@ export default function EditTrivia() {
                                 className="save-btn"
                                 onClick={async () => {
                                     if (!trivia) return;
+
                                     setConfirmSubmitOpen(false);
                                     setSubmitMessage('Finalizing trivia...');
                                     setLoading(true);
+
                                     try {
                                         await updateTriviaStatus(trivia.id, 'completed');
+                                        setSubmitMessage('Trivia finalized! Redirecting...');
+                                        // Wait 5 seconds then redirect:
                                         setTimeout(() => {
                                             router.push(prevPagePath);
-                                        }, 1500);
+                                        }, 5000);
                                     } catch {
                                         setSubmitMessage('Failed to finalize trivia.');
                                         setTimeout(() => setSubmitMessage(null), 4000);
-                                    } finally {
-                                        setLoading(false);
                                     }
                                 }}
                             >

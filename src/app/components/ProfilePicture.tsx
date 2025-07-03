@@ -8,6 +8,8 @@ import {
     generateUSERProfilePicSignedUrl
 } from '../../app/supabasefuncs/helperSupabaseFuncs';
 
+import '../cssStyling/ProfilePicture.css';
+
 export default function ProfilePicture() {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export default function ProfilePicture() {
                 {imageUrl ? (
                     <img src={imageUrl} alt="Profile" className="profile-pic-image" />
                 ) : (
-                    <div className="profile-pic-placeholder">+</div>
+                    <div />
                 )}
             </div>
 

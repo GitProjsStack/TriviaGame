@@ -9,7 +9,15 @@
   align-items: center;
   justify-content: center;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
-  animation: glow 3s ease-in-out infinite;
+  /* remove animation if you want */
+}
+
+.profile-pic-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
 }
 
 @keyframes glow {
@@ -21,22 +29,6 @@
   }
 }
 
-.profile-pic-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-}
-
-.profile-pic-placeholder {
-  font-size: 64px;
-  color: #999;
-  user-select: none;
-  animation: pulse 2s infinite;
-}
-
-
 .clickable {
   cursor: pointer;
 }
@@ -44,10 +36,6 @@
 .clickable:hover {
   box-shadow: 0 0 20px 6px rgba(100, 149, 237, 0.9);
   transform: scale(1.05);
-}
-
-.clickable:hover .profile-pic-placeholder {
-  color: #6495ed;
 }
 
 .clickable:hover .profile-pic-image {
@@ -58,19 +46,4 @@
   color: red;
   margin-top: 0.5rem;
   font-weight: 600;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }

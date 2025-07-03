@@ -9,9 +9,10 @@ import {
     getAllTriviaSharedWithUser,
     updateTriviaSharedWithUser,
     getTriviaById,
-} from '../../../supabasefuncs/helperSupabaseFuncs';
+} from '@/app/supabasefuncs/helperSupabaseFuncs';
 
 import '../../../cssStyling/shareTrivia.css';
+import ProfilePicture from '@/app/components/ProfilePicture';
 
 type ShareRecipient = {
     id: string;
@@ -36,7 +37,6 @@ export default function ShareTriviaPage() {
 
     // Load trivia title for display
     useEffect(() => {
-        console.log('triviaid:', triviaid);
         if (!triviaid) return;
 
         async function fetchTitle() {
@@ -91,26 +91,21 @@ export default function ShareTriviaPage() {
     async function handleShare(user: ShareRecipient) {
         setShareStatus(null);
 
-        // Get all trivia shared with this user
+        // Get all trivia shared with this user (as array of string IDs)
         const sharedTrivia = await getAllTriviaSharedWithUser(user);
-        if (sharedTrivia === null) {
+        if (!sharedTrivia) {
             setShareStatus('Failed to fetch user data.');
             return;
         }
 
-        // Check if trivia already shared
-        if (sharedTrivia.some((t) => t.id === triviaid)) {
+        // Check if already shared
+        if (sharedTrivia.includes(triviaid)) {
             setShareStatus(`"${triviaTitle}" was already shared with ${user.username}`);
             return;
         }
 
-        const updatedTriviaList = [
-            ...sharedTrivia,
-            {
-                id: triviaid as string,
-                title: triviaTitle,
-            },
-        ];
+        // Add new trivia ID
+        const updatedTriviaList = [...sharedTrivia, triviaid];
 
         const success = await updateTriviaSharedWithUser(user.id, updatedTriviaList);
 
@@ -147,12 +142,7 @@ export default function ShareTriviaPage() {
                                     className="search-user-card"
                                     onClick={() => handleShare(user)}
                                 >
-                                    <img
-                                        src={user.profile_pic_url || undefined}
-                                        alt="Profile"
-                                        className="user-avatar"
-                                        loading="lazy"
-                                    />
+                                    <ProfilePicture />
                                     <span>{user.username}</span>
                                 </div>
                             ))}

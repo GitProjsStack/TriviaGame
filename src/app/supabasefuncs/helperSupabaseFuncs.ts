@@ -2,7 +2,7 @@ import { supabase } from '../supabase/supabaseClient';
 
 export const CLIENTS_TABLE = 'clients';
 export const COL_MY_TRIVIA = 'my_trivia_games';
-export const COL_SHARED_TRIVIA = 'trivia_shared_w_me';
+export const COL_SHARED_TRIVIA = 'trivia_games_shared_w_me';
 export const COL_CREATOR_ID = 'creator_id';
 export const COL_USERNAME = 'username';
 export const COL_PROFILE_PIC = 'profile_pic_url';
@@ -117,23 +117,23 @@ export async function uploadToUSERProfilePics(
   return true;
 }
 
-export async function getAllTriviaSharedWithUser(user: ShareRecipient): Promise<{ id: string; title: string }[] | null> {
-  const { data, error } = await supabase
-    .from(CLIENTS_TABLE)
-    .select(COL_SHARED_TRIVIA)
-    .eq('id', user.id)
-    .single();
+export async function getAllTriviaSharedWithUser(user: ShareRecipient): Promise<string[] | null> {
+    const { data, error } = await supabase
+        .from(CLIENTS_TABLE)
+        .select(COL_SHARED_TRIVIA)
+        .eq(COL_CREATOR_ID, user.id)
+        .single();
 
-  if (error || !data) return null;
+    if (error || !data) return null;
 
-  return data[COL_SHARED_TRIVIA] || [];
+    return data[COL_SHARED_TRIVIA] || [];
 }
 
-export async function updateTriviaSharedWithUser(userId: string, updated: { id: string; title: string }[]): Promise<boolean> {
+export async function updateTriviaSharedWithUser(userId: string, updated: string[]): Promise<boolean> {
   const { error } = await supabase
     .from(CLIENTS_TABLE)
     .update({ [COL_SHARED_TRIVIA]: updated })
-    .eq('id', userId);
+    .eq(COL_CREATOR_ID, userId);
 
   return !error;
 }

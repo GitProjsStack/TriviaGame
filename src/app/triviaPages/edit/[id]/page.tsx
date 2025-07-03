@@ -7,24 +7,8 @@ import {
     updateTriviaContent,
     updateTriviaStatus
 } from '../../../supabasefuncs/helperSupabaseFuncs';
+import { Question, TriviaGame } from '../../../interfaces/triviaTypes';
 import '../../../cssStyling/editTriviastyling.css';
-
-interface Question {
-    question: string;
-    choices: Record<string, string>;
-    answer: string;
-}
-
-interface TriviaContent {
-    [category: string]: Question[];
-}
-
-interface TriviaGame {
-    id: string;
-    title: string;
-    status: string;
-    content: TriviaContent;
-}
 
 const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
@@ -42,11 +26,13 @@ export default function EditTrivia() {
     const [targetCategory, setTargetCategory] = useState<string | null>(null);
 
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+
     const [newCategoryName, setNewCategoryName] = useState('');
     const [categoryError, setCategoryError] = useState<string | null>(null);
-
     const [newQuestionText, setNewQuestionText] = useState('');
     const [newChoices, setNewChoices] = useState([generateChoice(), generateChoice()]);
+    const [newPoints, setNewPoints] = useState<number | null>(null);
+
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
 
@@ -87,6 +73,7 @@ export default function EditTrivia() {
         setTargetCategory(category);
         setNewQuestionText('');
         setNewChoices([generateChoice(), generateChoice()]);
+        setNewPoints(null);
         setSelectedAnswerId(null);
         setFormError(null);
         setModalOpen(true);
@@ -105,10 +92,14 @@ export default function EditTrivia() {
         });
 
         const correctIndex = filledChoices.findIndex((c) => c.id === selectedAnswerId);
+        if (newPoints === null || isNaN(newPoints) || newPoints <= 0)
+            return setFormError('Please enter a valid number of points.');
+
         const newQ: Question = {
             question: newQuestionText.trim(),
             choices: choicesRecord,
             answer: indexToLetter(correctIndex),
+            points: newPoints,
         };
 
         const updated = {
@@ -254,7 +245,7 @@ export default function EditTrivia() {
                         {questions.map((q, i) => (
                             <div key={i} className="question-box">
                                 <div className="question-header">
-                                    <p><strong>Q{i + 1}:</strong> {q.question}</p>
+                                    <p><strong>Q{i + 1}:</strong> {q.question} <span className="points-tag">({q.points} pts)</span></p>
                                     <button
                                         className="delete-question-btn"
                                         onClick={() => deleteQuestion(cat, i)}
@@ -304,6 +295,17 @@ export default function EditTrivia() {
                                 rows={3}
                                 value={newQuestionText}
                                 onChange={(e) => setNewQuestionText(e.target.value)}
+                            />
+                        </label>
+
+                        <label className="modal-label">
+                            <span>Points:</span>
+                            <input
+                                type="number"
+                                className="points-input"
+                                value={newPoints !== null ? newPoints : ''}
+                                onChange={(e) => setNewPoints(parseInt(e.target.value))}
+                                min={1}
                             />
                         </label>
 

@@ -74,7 +74,7 @@ export default function CreateEditTrivias() {
       creator_id: user.id,
       title: newTitle.trim(),
       status: 'in progress',
-      content: { questions: [] },
+      content: {},
     });
 
     if (!created.success) {
@@ -122,7 +122,7 @@ export default function CreateEditTrivias() {
               <h2>{game.title}</h2>
               <p>Status: {game.status}</p>
               <div className="cet-card-actions">
-                <button onClick={() => router.push(`/edit/${game.id}`)}>✏️ Edit</button>
+                <button onClick={() => router.push(`./edit/${game.id}`)}>✏️ Edit</button>
                 <button onClick={() => console.log(`Delete ${game.id}`)}>🗑️ Delete</button>
                 <button
                   disabled={!canBeShared(game.content)}

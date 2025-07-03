@@ -19,7 +19,7 @@ export default function Dashboard() {
           tabIndex={0}
           onKeyDown={(e) => e.key === 'Enter' && router.push('./createEditTrivias')}
         >
-          <h2>Create / Edit a Trivia Game</h2>
+          <h2>Create, Edit, or Share a Trivia Game</h2>
           <p>Build new trivia or update existing ones.</p>
         </div>
 

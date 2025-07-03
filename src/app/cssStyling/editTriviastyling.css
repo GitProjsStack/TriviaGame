@@ -1,6 +1,7 @@
 .edit-container {
+    width: 100%;
     padding: 2rem;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #4a2c00;
@@ -11,7 +12,7 @@
 }
 
 /* Center title */
-.edit-container > h1 {
+.edit-container>h1 {
     font-size: 2.25rem;
     margin-bottom: 2rem;
     font-weight: 700;
@@ -29,7 +30,8 @@
 .category-section h2 {
     font-size: 1.8rem;
     margin-bottom: 1rem;
-    color: #d97706; /* warm amber */
+    color: #d97706;
+    /* warm amber */
 }
 
 /* Question bubble */
@@ -113,9 +115,10 @@
 }
 
 /* Left side label styling */
-.modal-label > span,
-.choice-label > span {
-    flex: 0 0 100px; /* fixed width for alignment */
+.modal-label>span,
+.choice-label>span {
+    flex: 0 0 100px;
+    /* fixed width for alignment */
     font-weight: 700;
     font-size: 1.1rem;
     color: #7c2d12;
@@ -237,7 +240,7 @@
     font-size: 1.1rem;
     cursor: pointer;
     font-weight: 700;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
 }
 
 .cancel-btn {
@@ -262,48 +265,49 @@
 
 .add-category-btn,
 .add-question-btn {
-  background: linear-gradient(135deg, #ffb347, #ff7f50);
-  border: none;
-  border-radius: 24px;
-  padding: 0.8rem 2rem;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: white;
-  box-shadow:
-    0 6px 12px rgba(255, 126, 66, 0.7),
-    0 4px 10px rgba(255, 160, 100, 0.6) inset;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #ffb347, #ff7f50);
+    border: none;
+    border-radius: 24px;
+    padding: 0.8rem 2rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: white;
+    box-shadow:
+        0 6px 12px rgba(255, 126, 66, 0.7),
+        0 4px 10px rgba(255, 160, 100, 0.6) inset;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .add-category-btn:hover,
 .add-question-btn:hover {
-  background: linear-gradient(135deg, #ff7f50, #ffb347);
-  box-shadow:
-    0 10px 20px rgba(255, 126, 66, 0.85),
-    0 6px 16px rgba(255, 160, 100, 0.8) inset;
-  transform: scale(1.05);
+    background: linear-gradient(135deg, #ff7f50, #ffb347);
+    box-shadow:
+        0 10px 20px rgba(255, 126, 66, 0.85),
+        0 6px 16px rgba(255, 160, 100, 0.8) inset;
+    transform: scale(1.05);
 }
 
 .add-category-btn:active,
 .add-question-btn:active {
-  transform: scale(0.95);
-  box-shadow:
-    0 4px 8px rgba(255, 126, 66, 0.6),
-    0 3px 6px rgba(255, 160, 100, 0.5) inset;
+    transform: scale(0.95);
+    box-shadow:
+        0 4px 8px rgba(255, 126, 66, 0.6),
+        0 3px 6px rgba(255, 160, 100, 0.5) inset;
 }
 
 /* Responsive tweaks */
 @media (max-width: 480px) {
+
     .modal-label,
     .choice-input-row {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .modal-label > span,
-    .choice-label > span {
+    .modal-label>span,
+    .choice-label>span {
         margin-bottom: 0.5rem;
         flex: none;
     }
@@ -332,14 +336,75 @@
     text-decoration: underline;
 }
 
+/* Category header with delete button on the right */
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Style for the delete category button (the ✕) */
+.delete-category-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: #e53e3e;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0.2rem 0.5rem;
+}
+
+.delete-category-btn:hover {
+    color: #9b2c2c;
+}
+
+/* Question header (Q1: ...) and delete button */
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+/* Delete question button */
+.delete-question-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #e53e3e;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0.2rem 0.4rem;
+}
+
+.delete-question-btn:hover {
+    color: #9b2c2c;
+}
+
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .category-card {
     background-color: #fff7e6;
+    width: 100%;
+    box-sizing: border-box;
     border: 2px solid #f6ad55;
     border-radius: 20px;
     padding: 1.5rem;
@@ -376,7 +441,7 @@
     gap: 0.75rem;
 }
 
-.modal-box.category-modal .modal-label > span {
+.modal-box.category-modal .modal-label>span {
     font-size: 1.15rem;
     font-weight: 600;
     color: #8b3200;
@@ -396,4 +461,25 @@
     border-color: #f59e0b;
     outline: none;
     background-color: #fff3cd;
+}
+
+.submit-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.submit-message {
+    text-align: center;
+    margin-top: 16px;
+    font-weight: bold;
+    color: green;
+}
+
+.submit-message.success {
+    color: green;
+}
+
+.submit-message.error {
+    color: red;
 }

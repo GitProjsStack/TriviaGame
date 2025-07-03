@@ -76,6 +76,7 @@ export default function ShareTriviaPage() {
                 const signedUrl = user.profile_pic_url
                     ? await generateUSERProfilePicSignedUrl(user.profile_pic_url)
                     : null;
+
                 return {
                     id: user.id,
                     username: user.username,
@@ -142,7 +143,7 @@ export default function ShareTriviaPage() {
                                     className="search-user-card"
                                     onClick={() => handleShare(user)}
                                 >
-                                    <ProfilePicture />
+                                    <ProfilePicture src={user.profile_pic_url} alt={`${user.username}'s profile picture`} />
                                     <span>{user.username}</span>
                                 </div>
                             ))}

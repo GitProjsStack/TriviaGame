@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { handleSignOut } from '../../supabasefuncs/helperSupabaseFuncs';
 import ProfilePicture from '../../components/ProfilePicture';
 import '../../cssStyling/dashboardstyling.css';
 
@@ -9,7 +10,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <ProfilePicture />
+      <ProfilePicture clickable={true} />
       <h1 className="dashboard-title">Welcome to TriviaShare Dashboard</h1>
 
       <div className="dashboard-sections">
@@ -34,7 +35,16 @@ export default function Dashboard() {
           <h2>Play Trivias Shared With Me</h2>
           <p>Try trivia games shared by friends or other users.</p>
         </div>
+
       </div>
+
+      <button
+        onClick={() => handleSignOut(() => router.push('../..'))}
+        className="signout-button"
+      >
+        Sign Out
+      </button>
+
     </div>
   );
 }

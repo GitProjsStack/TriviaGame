@@ -57,3 +57,30 @@
   color: #6b7280;
   line-height: 1.5;
 }
+
+.signout-button {
+  margin-top: 2.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #f97316;              /* same orange as card headings */
+  background-color: #fff7ed;   /* a soft warm off-white */
+  border: 3px solid #fcd34d;   /* same golden border as cards */
+  border-radius: 24px;
+  box-shadow: 0 8px 25px rgba(252, 211, 77, 0.25);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  text-align: center;
+  user-select: none;
+}
+
+.signout-button:hover {
+  background-color: #fef3c7;   /* slightly lighter */
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(253, 224, 71, 0.35);
+}
+
+.signout-button:active {
+  transform: scale(0.98);
+  box-shadow: 0 6px 18px rgba(253, 224, 71, 0.25);
+}

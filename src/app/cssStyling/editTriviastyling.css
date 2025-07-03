@@ -1,0 +1,399 @@
+.edit-container {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #4a2c00;
+    background-color: #fff8e1;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(253, 160, 133, 0.25);
+    text-align: center;
+}
+
+/* Center title */
+.edit-container > h1 {
+    font-size: 2.25rem;
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+/* Category section left aligned but with spacing */
+.category-section {
+    margin-bottom: 2rem;
+    border-top: 1px solid #f4b261;
+    padding-top: 1rem;
+    text-align: left;
+}
+
+/* Category title */
+.category-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #d97706; /* warm amber */
+}
+
+/* Question bubble */
+.question-box {
+    background-color: #fff3cd;
+    border-radius: 18px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: inset 0 4px 12px #fbd38d88;
+}
+
+/* Each question text, strong Q number on left */
+.question-box p {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: #b45309;
+}
+
+/* Choices list styling */
+.choice-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0;
+}
+
+/* Each choice bubble */
+.choice-item {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    background-color: #fff8e1;
+    border: 2px solid #f6ad55;
+    box-shadow: 0 2px 6px #f6ad5580 inset;
+    font-size: 1rem;
+}
+
+/* Correct answer highlight */
+.correct-answer {
+    background-color: #d1fae5;
+    border-color: #22c55e;
+    font-weight: 700;
+    color: #166534;
+}
+
+/* Modal styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Modal bubble */
+.modal-box {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    padding: 2.2rem 2.5rem;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow:
+        0 8px 16px rgba(253, 160, 133, 0.4),
+        0 4px 8px rgba(246, 211, 101, 0.3);
+    color: #4a2c00;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Label and input container as a flex row with space-between */
+.modal-label,
+.choice-input-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Left side label styling */
+.modal-label > span,
+.choice-label > span {
+    flex: 0 0 100px; /* fixed width for alignment */
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #7c2d12;
+}
+
+/* The label wrapper for choices */
+.choice-label {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Input text fields aligned right */
+.modal-label textarea,
+.choice-label input[type="text"] {
+    flex: 1 1 auto;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #ffae42;
+    border-radius: 14px;
+    background-color: #fff8e1;
+    box-shadow: inset 0 2px 5px rgba(255, 174, 66, 0.3);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: border-color 0.3s ease;
+    margin-left: 1rem;
+}
+
+.modal-label textarea:focus,
+.choice-label input[type="text"]:focus {
+    border-color: #ff7f50;
+    outline: none;
+    background-color: #fff3cd;
+}
+
+/* Checkmark button next to choice */
+.select-answer-btn {
+    font-size: 1.4rem;
+    background-color: #fbd38d;
+    border: 2px solid #f6ad55;
+    border-radius: 50%;
+    padding: 0.35rem 0.55rem;
+    cursor: pointer;
+    color: #a15900;
+    box-shadow: 0 2px 6px rgba(246, 173, 85, 0.4);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 0.7rem;
+}
+
+.select-answer-btn.selected {
+    background-color: #f59e0b;
+    border-color: #b45309;
+    color: white;
+    box-shadow: 0 0 12px #f59e0baa;
+}
+
+.select-answer-btn:hover:not(.selected) {
+    background-color: #fbd38dcc;
+}
+
+/* Remove button styling */
+.remove-choice-btn {
+    background: none;
+    border: none;
+    color: #e53e3e;
+    font-size: 1.4rem;
+    cursor: pointer;
+    margin-left: 0.7rem;
+    transition: color 0.3s ease;
+}
+
+.remove-choice-btn:hover {
+    color: #9b2c2c;
+}
+
+/* Add choice button */
+.add-choice-btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.3rem;
+    font-size: 1.05rem;
+    background-color: #38b2ac;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px #319795aa;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+}
+
+.add-choice-btn:hover {
+    background-color: #2c7a7b;
+}
+
+/* Form error message */
+.form-error {
+    color: #b33232;
+    font-size: 1rem;
+    margin-top: 0.8rem;
+    text-align: center;
+    font-weight: 600;
+    text-shadow: 1px 1px 1px #ffe6e6;
+}
+
+/* Modal footer buttons container */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.2rem;
+    margin-top: 2rem;
+}
+
+/* Cancel and Save buttons */
+.cancel-btn,
+.save-btn {
+    padding: 0.6rem 1.4rem;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+}
+
+.cancel-btn {
+    background-color: #718096;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background-color: #4a5568;
+}
+
+.save-btn {
+    background-color: #2f855a;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+    background-color: #276749;
+}
+
+.add-category-btn,
+.add-question-btn {
+  background: linear-gradient(135deg, #ffb347, #ff7f50);
+  border: none;
+  border-radius: 24px;
+  padding: 0.8rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  box-shadow:
+    0 6px 12px rgba(255, 126, 66, 0.7),
+    0 4px 10px rgba(255, 160, 100, 0.6) inset;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.add-category-btn:hover,
+.add-question-btn:hover {
+  background: linear-gradient(135deg, #ff7f50, #ffb347);
+  box-shadow:
+    0 10px 20px rgba(255, 126, 66, 0.85),
+    0 6px 16px rgba(255, 160, 100, 0.8) inset;
+  transform: scale(1.05);
+}
+
+.add-category-btn:active,
+.add-question-btn:active {
+  transform: scale(0.95);
+  box-shadow:
+    0 4px 8px rgba(255, 126, 66, 0.6),
+    0 3px 6px rgba(255, 160, 100, 0.5) inset;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+    .modal-label,
+    .choice-input-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .modal-label > span,
+    .choice-label > span {
+        margin-bottom: 0.5rem;
+        flex: none;
+    }
+
+    .modal-label textarea,
+    .choice-label input[type="text"] {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .select-answer-btn,
+    .remove-choice-btn {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}
+
+.back-button {
+    background: none;
+    border: none;
+    color: #d97706;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.category-card {
+    background-color: #fff7e6;
+    border: 2px solid #f6ad55;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 10px rgba(246, 173, 85, 0.25);
+    text-align: left;
+}
+
+/* Revised and more spacious category modal */
+.modal-box.category-modal {
+    background: linear-gradient(135deg, #fffaf0 0%, #ffe4b5 100%);
+    padding: 3rem 3.5rem;
+    max-width: 540px;
+    width: 90%;
+    border-radius: 28px;
+    box-shadow:
+        0 14px 28px rgba(255, 180, 120, 0.35),
+        0 6px 12px rgba(255, 200, 130, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.modal-box.category-modal h2 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #a35b00;
+    text-align: center;
+}
+
+.modal-box.category-modal .modal-label {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+}
+
+.modal-box.category-modal .modal-label > span {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #8b3200;
+}
+
+.modal-box.category-modal input[type="text"] {
+    font-size: 1.1rem;
+    padding: 0.7rem 1rem;
+    border-radius: 16px;
+    border: 2px solid #ffb347;
+    background-color: #fff8e1;
+    box-shadow: inset 0 3px 6px rgba(255, 174, 66, 0.15);
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.modal-box.category-modal input[type="text"]:focus {
+    border-color: #f59e0b;
+    outline: none;
+    background-color: #fff3cd;
+}

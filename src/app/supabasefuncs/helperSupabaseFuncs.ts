@@ -109,3 +109,16 @@ export async function updateTriviaContent(triviaId: string, content: any) {
   }
   return data;
 }
+
+export async function updateTriviaStatus(triviaId: string, status: string) {
+    const { data, error } = await supabase
+        .from(TRIVIA_TABLE)
+        .update({ status })
+        .eq('id', triviaId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+}

@@ -2,7 +2,10 @@ import { supabase } from '../supabase/supabaseClient';
 
 export const CLIENTS_TABLE = 'clients';
 export const COL_MY_TRIVIA = 'my_trivia_games';
+export const COL_SHARED_TRIVIA = 'trivia_shared_w_me';
 export const COL_CREATOR_ID = 'creator_id';
+export const COL_USERNAME = 'username';
+export const COL_PROFILE_PIC = 'profile_pic_url';
 
 export const TRIVIA_TABLE = 'triviagames';
 export const COL_TRIVIA_ID = 'id';
@@ -10,9 +13,24 @@ export const COL_TRIVIA_TITLE = 'title';
 export const COL_TRIVIA_STATUS = 'status';
 export const COL_TRIVIA_CONTENT = 'content';
 export const COL_TRIVIA_CREATED_AT = 'created_at';
-export const ALL = '*';
 
-// Get current logged-in user
+const SELECT_CLIENT_FIELDS = [ COL_CREATOR_ID, COL_USERNAME, COL_PROFILE_PIC ].join(', ');
+const AVATAR_BUCKET = 'avatars';
+
+export type ShareRecipient = {
+  id: string;
+  username: string;
+  profile_pic_url: string | null;
+};
+
+function toShareRecipient(user: any): ShareRecipient {
+    return {
+        id: user[COL_CREATOR_ID],
+        username: user[COL_USERNAME],
+        profile_pic_url: user[COL_PROFILE_PIC],
+    };
+}
+
 export async function getAuthenticatedUser() {
   const {
     data: { user },
@@ -22,7 +40,119 @@ export async function getAuthenticatedUser() {
   return user;
 }
 
-// Get list of Trivia games for a user - ordered by creation time (timestamp)
+export async function fetchMatchingUsersBySimilarName(
+    name: string
+): Promise<ShareRecipient[]> {
+    const { data, error } = await supabase
+        .from(CLIENTS_TABLE)
+        .select(SELECT_CLIENT_FIELDS)
+        .ilike(COL_USERNAME, `${name}%`);
+
+    if (error || !data) {
+        console.error('Error fetching users:', error);
+        return [];
+    }
+
+    return data.map(toShareRecipient);
+}
+
+export async function getUSERProfile(userId: string) {
+  const { data, error } = await supabase
+    .from(CLIENTS_TABLE)
+    .select('*')
+    .eq(COL_CREATOR_ID, userId)
+    .single();
+
+  if (error || !data) {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function uploadToUSERProfilePics(
+  userID: string,
+  filePath: string,
+  file: File,
+  oldFilePath?: string
+): Promise<boolean> {
+  // 1. Delete old profile pic if it exists
+  if (oldFilePath) {
+    const { error: deleteError } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .remove([oldFilePath]);
+
+    if (deleteError) {
+      console.error('Error deleting old user profile pic:', deleteError);
+      // You can choose to return false or just log and continue
+      // return false;
+    }
+  }
+
+  // 2. Upload new profile pic
+  const { error: uploadError } = await supabase.storage
+    .from(AVATAR_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true,
+    });
+
+  if (uploadError) {
+    console.error('Upload error:', uploadError);
+    return false;
+  }
+
+  // 3. Update DB with new file path
+  const { error: updateError } = await supabase
+    .from(CLIENTS_TABLE)
+    .update({ profile_pic_url: filePath })
+    .eq(COL_CREATOR_ID, userID);
+
+  if (updateError) {
+    console.error('DB update failed:', updateError);
+    return false;
+  }
+
+  return true;
+}
+
+export async function getAllTriviaSharedWithUser(user: ShareRecipient): Promise<{ id: string; title: string }[] | null> {
+  const { data, error } = await supabase
+    .from(CLIENTS_TABLE)
+    .select(COL_SHARED_TRIVIA)
+    .eq('id', user.id)
+    .single();
+
+  if (error || !data) return null;
+
+  return data[COL_SHARED_TRIVIA] || [];
+}
+
+export async function updateTriviaSharedWithUser(userId: string, updated: { id: string; title: string }[]): Promise<boolean> {
+  const { error } = await supabase
+    .from(CLIENTS_TABLE)
+    .update({ [COL_SHARED_TRIVIA]: updated })
+    .eq('id', userId);
+
+  return !error;
+}
+
+export async function generateUSERProfilePicSignedUrl(filePath: string, expiresInSeconds = 60): Promise<string | null> {
+  const { data, error } = await supabase
+    .storage
+    .from(AVATAR_BUCKET)
+    .createSignedUrl(filePath, expiresInSeconds);
+
+  if (error || !data?.signedUrl) {
+    console.error('Error creating signed URL:', error);
+    return null;
+  }
+
+  return data.signedUrl;
+}
+
+
 export async function getMyTriviaGames(userId: string) {
   const { data: clientData, error: clientError } = await supabase
     .from(CLIENTS_TABLE)
@@ -37,7 +167,7 @@ export async function getMyTriviaGames(userId: string) {
 
   const { data: triviaData, error: triviaError } = await supabase
     .from(TRIVIA_TABLE)
-    .select(ALL)
+    .select('*')
     .in(COL_TRIVIA_ID, triviaIds)
     .order(COL_TRIVIA_CREATED_AT, { ascending: true });
 
@@ -46,7 +176,6 @@ export async function getMyTriviaGames(userId: string) {
   return triviaData;
 }
 
-// Create a new empty trivia game and return inserted ID and timestamp
 export async function createTriviaGame(trivia: {
   creator_id: string;
   title: string;
@@ -63,12 +192,10 @@ export async function createTriviaGame(trivia: {
   return { success: true, triviaId: data.id, createdAt: data.created_at };
 }
 
-// Add a trivia id to client's my_trivia_games array
 export async function addTriviaIdToClient(
   userId: string,
   triviaId: string
 ): Promise<{ success: boolean; error?: string }> {
-  // Get current my_trivia_games array
   const { data: clientData, error: clientError } = await supabase
     .from(CLIENTS_TABLE)
     .select(COL_MY_TRIVIA)
@@ -78,8 +205,6 @@ export async function addTriviaIdToClient(
   if (clientError || !clientData) return { success: false, error: clientError?.message || 'Client not found' };
 
   const currentList: string[] = clientData[COL_MY_TRIVIA] || [];
-
-  // Avoid duplicates
   if (currentList.includes(triviaId)) return { success: true };
 
   const updatedList = [...currentList, triviaId];
@@ -96,7 +221,7 @@ export async function addTriviaIdToClient(
 export async function getTriviaById(id: string) {
   const { data, error } = await supabase
     .from(TRIVIA_TABLE)
-    .select(ALL)
+    .select('*')
     .eq('id', id)
     .single();
 
@@ -112,23 +237,18 @@ export async function updateTriviaContent(triviaId: string, content: any) {
     .select('id')
     .single();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
   return data;
 }
 
 export async function updateTriviaStatus(triviaId: string, status: string) {
-    const { data, error } = await supabase
-        .from(TRIVIA_TABLE)
-        .update({ status })
-        .eq('id', triviaId);
+  const { data, error } = await supabase
+    .from(TRIVIA_TABLE)
+    .update({ status })
+    .eq('id', triviaId);
 
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    return data;
+  if (error) throw new Error(error.message);
+  return data;
 }
 
 export async function deleteTriviaById(triviaId: string): Promise<{ success: boolean; error?: string }> {

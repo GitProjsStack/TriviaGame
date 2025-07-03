@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-
+import ProfilePicture from '../../components/ProfilePicture';
 import '../../cssStyling/dashboardstyling.css';
 
 export default function Dashboard() {
@@ -9,6 +9,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
+      <ProfilePicture />
       <h1 className="dashboard-title">Welcome to TriviaShare Dashboard</h1>
 
       <div className="dashboard-sections">

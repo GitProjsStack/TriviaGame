@@ -148,7 +148,7 @@ export default function CreateEditTrivias() {
                 </button>
                 <button
                   disabled={game.status !== 'completed'}
-                  onClick={() => console.log(`Share ${game.id}`)}
+                  onClick={() => router.push(`./shareTrivia/${game.id}`)}
                 >
                   📤 Share
                 </button>

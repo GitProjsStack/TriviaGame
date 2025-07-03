@@ -3,7 +3,11 @@ import { supabase } from '../supabase/supabaseClient';
 export const CLIENTS_TABLE = 'clients';
 export const TRIVIA_TABLE = 'triviagames';
 export const COL_CREATOR_ID = 'creator_id';
+export const COL_TITLE = 'title';
+export const COL_STATUS = 'status';
+export const COL_CONTENT = 'content';
 export const COL_MY_TRIVIA = 'my_trivia_games';
+export const ALL = '*';
 
 // Get current logged-in user
 export async function getAuthenticatedUser() {
@@ -79,4 +83,29 @@ export async function addTriviaIdToClient(
 
   if (updateError) return { success: false, error: updateError.message };
   return { success: true };
+}
+
+export async function getTriviaById(id: string) {
+  const { data, error } = await supabase
+    .from(TRIVIA_TABLE)
+    .select(ALL)
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return { error: error?.message || 'Trivia not found', trivia: null };
+  return { trivia: data, error: null };
+}
+
+export async function updateTriviaContent(triviaId: string, content: any) {
+  const { data, error } = await supabase
+    .from(TRIVIA_TABLE)
+    .update({ content })
+    .eq('id', triviaId)
+    .select('id')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
 }

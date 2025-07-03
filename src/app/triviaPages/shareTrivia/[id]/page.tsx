@@ -10,19 +10,10 @@ import {
     updateTriviaSharedWithUser,
     getTriviaById,
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
+import { ShareRecipient, TriviaParams } from '@/app/interfaces/triviaTypes';
 
 import '../../../cssStyling/shareTrivia.css';
 import ProfilePicture from '@/app/components/ProfilePicture';
-
-type ShareRecipient = {
-    id: string;
-    username: string;
-    profile_pic_url: string | null;
-};
-
-type TriviaParams = {
-    id: string;
-};
 
 export default function ShareTriviaPage() {
     const router = useRouter();

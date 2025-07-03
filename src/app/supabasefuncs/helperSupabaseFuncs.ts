@@ -1,4 +1,5 @@
 import { supabase } from '../supabase/supabaseClient';
+import { ShareRecipient } from '../interfaces/triviaTypes';
 
 export const CLIENTS_TABLE = 'clients';
 export const COL_MY_TRIVIA = 'my_trivia_games';
@@ -16,12 +17,6 @@ export const COL_TRIVIA_CREATED_AT = 'created_at';
 
 const SELECT_CLIENT_FIELDS = [COL_CREATOR_ID, COL_USERNAME, COL_PROFILE_PIC].join(', ');
 const AVATAR_BUCKET = 'avatars';
-
-export type ShareRecipient = {
-  id: string;
-  username: string;
-  profile_pic_url: string | null;
-};
 
 function toShareRecipient(user: any): ShareRecipient {
   return {

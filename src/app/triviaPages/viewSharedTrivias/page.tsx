@@ -8,15 +8,8 @@ import {
   removeTriviaFromSharedWithMe,
   generateUSERProfilePicSignedUrl,
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
+import { SharedTrivia } from '@/app/interfaces/triviaTypes';
 import '../../cssStyling/viewSharedTrivias.css';
-
-type SharedTrivia = {
-  triviaId: string;
-  title: string;
-  creatorId: string;
-  sharerUsername: string;
-  sharerProfilePicUrl: string | null;
-};
 
 export default function ViewSharedTrivias() {
   const router = useRouter();
@@ -27,7 +20,7 @@ export default function ViewSharedTrivias() {
     setLoading(true);
     const user = await getAuthenticatedUser();
     if (!user) {
-      router.push('/login'); // or wherever you want unauth users to go
+      router.push('/login');
       return;
     }
     const data = await getSharedTriviasWithSharerInfo(user.id);

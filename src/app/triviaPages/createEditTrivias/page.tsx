@@ -9,14 +9,8 @@ import {
   addTriviaIdToClient,
   deleteTriviaById,
 } from '../../supabasefuncs/helperSupabaseFuncs';
+import { TriviaGame } from '../../interfaces/triviaTypes';
 import '../../cssStyling/createEditTrivias.css';
-
-interface TriviaGame {
-  id: string;
-  title: string;
-  status: string;
-  content: any;
-}
 
 export default function CreateEditTrivias() {
   const router = useRouter();

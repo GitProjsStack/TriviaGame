@@ -7,6 +7,7 @@ import {
   getMyTriviaGames,
   createTriviaGame,
   addTriviaIdToClient,
+  deleteTriviaById,
 } from '../../supabasefuncs/helperSupabaseFuncs';
 import '../../cssStyling/createEditTrivias.css';
 
@@ -25,7 +26,9 @@ export default function CreateEditTrivias() {
   const [showModal, setShowModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [deleteErrorMsg, setDeleteErrorMsg] = useState('');
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTriviaGames = async () => {
@@ -39,19 +42,6 @@ export default function CreateEditTrivias() {
 
     fetchTriviaGames();
   }, []);
-
-  const canBeShared = (content: any): boolean => {
-    if (!content || !Array.isArray(content.questions)) return false;
-    const categoryMap: Record<string, number> = {};
-    content.questions.forEach((q: any) => {
-      categoryMap[q.category] = (categoryMap[q.category] || 0) + 1;
-    });
-
-    const counts = Object.values(categoryMap);
-    const isUniform = counts.every((count) => count === counts[0]);
-
-    return isUniform && counts.length > 0 && counts[0] > 0;
-  };
 
   // Handle Create New Trivia submit
   const handleCreateTrivia = async () => {
@@ -69,7 +59,6 @@ export default function CreateEditTrivias() {
       return;
     }
 
-    // Create empty trivia row
     const created = await createTriviaGame({
       creator_id: user.id,
       title: newTitle.trim(),
@@ -83,7 +72,6 @@ export default function CreateEditTrivias() {
       return;
     }
 
-    // Update client's my_trivia_games list
     const updated = await addTriviaIdToClient(user.id, created.triviaId!);
     if (!updated.success) {
       setErrorMsg('Failed to update client trivia list: ' + updated.error);
@@ -91,7 +79,6 @@ export default function CreateEditTrivias() {
       return;
     }
 
-    // Refresh list with new trivia included
     const games = await getMyTriviaGames(user.id);
     setTriviaGames(games);
 
@@ -100,12 +87,40 @@ export default function CreateEditTrivias() {
     setCreating(false);
   };
 
+  const handleDeleteTrivia = async (id: string) => {
+    setDeleteErrorMsg('');
+    setDeletingId(id);
+
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      setDeleteErrorMsg('User not authenticated.');
+      setDeletingId(null);
+      return;
+    }
+
+    const result = await deleteTriviaById(id);
+
+    if (!result.success) {
+      setDeleteErrorMsg('Failed to delete trivia: ' + result.error);
+      setDeletingId(null);
+      return;
+    }
+
+    // Refresh list after delete
+    const games = await getMyTriviaGames(user.id);
+    setTriviaGames(games);
+    setDeletingId(null);
+  };
+
   return (
     <div className="cet-container">
       <h1 className="cet-title">Create, Edit, or Share a Trivia!</h1>
       <p className="cet-subtext">
         Design new trivia games or update ones you’ve already created.
       </p>
+
+      {errorMsg && <p className="cet-error">{errorMsg}</p>}
+      {deleteErrorMsg && <p className="cet-error">{deleteErrorMsg}</p>}
 
       <button className="cet-back-button" onClick={() => router.push('./dashboard')}>
         ← Back to Dashboard
@@ -125,7 +140,12 @@ export default function CreateEditTrivias() {
                 {game.status !== 'completed' && (
                   <button onClick={() => router.push(`./edit/${game.id}`)}>✏️ Edit</button>
                 )}
-                <button onClick={() => console.log(`Delete ${game.id}`)}>🗑️ Delete</button>
+                <button
+                  onClick={() => handleDeleteTrivia(game.id)}
+                  disabled={deletingId === game.id}
+                >
+                  {deletingId === game.id ? 'Deleting...' : '🗑️ Delete'}
+                </button>
                 <button
                   disabled={game.status !== 'completed'}
                   onClick={() => console.log(`Share ${game.id}`)}

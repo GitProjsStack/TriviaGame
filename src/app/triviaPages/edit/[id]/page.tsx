@@ -2,7 +2,11 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getTriviaById, updateTriviaContent } from '../../../supabasefuncs/helperSupabaseFuncs';
+import {
+    getTriviaById,
+    updateTriviaContent,
+    updateTriviaStatus
+} from '../../../supabasefuncs/helperSupabaseFuncs';
 import '../../../cssStyling/editTriviastyling.css';
 
 interface Question {
@@ -22,6 +26,7 @@ interface TriviaGame {
     content: TriviaContent;
 }
 
+const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
 const generateChoice = () => ({ id: crypto.randomUUID(), text: '' });
 
@@ -46,6 +51,9 @@ export default function EditTrivia() {
     const [formError, setFormError] = useState<string | null>(null);
 
     const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
+    const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+
+    const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -183,12 +191,33 @@ export default function EditTrivia() {
         setTimeout(() => setDeleteMessage(null), 4000);
     };
 
+    const submitTrivia = () => {
+        if (!trivia) return;
+
+        const categoryCount = Object.keys(trivia.content).length;
+        if (categoryCount === 0 || categoryCount > 9) {
+            setSubmitMessage('Trivia must have between 1 and 9 categories.');
+            setTimeout(() => setSubmitMessage(null), 4000);
+            return;
+        }
+
+        for (const [cat, questions] of Object.entries(trivia.content)) {
+            if (questions.length === 0 || questions.length > 9) {
+                setSubmitMessage(`Category "${cat}" must have between 1 and 9 questions.`);
+                setSubmitMessage(null)
+                return;
+            }
+        }
+
+        setConfirmSubmitOpen(true);
+    };
+
     if (loading) return <p>Loading...</p>;
     if (error || !trivia) return <p>Error: {error || 'Not found'}</p>;
 
     return (
         <div className="edit-container">
-            <button className="back-button" onClick={() => router.push('../createEditTrivias')}>
+            <button className="back-button" onClick={() => router.push(prevPagePath)}>
                 ← Back
             </button>
 
@@ -243,8 +272,17 @@ export default function EditTrivia() {
                         <button className="add-question-btn" onClick={() => openQuestionModal(cat)}>
                             + Add Question
                         </button>
+
                     </div>
                 ))}
+            </div>
+
+            {submitMessage && <p className="submit-message">{submitMessage}</p>}
+
+            <div className="submit-container">
+                <button className="add-question-btn" onClick={submitTrivia}>
+                    ✅ Submit Trivia
+                </button>
             </div>
 
             {/* Question Modal */}
@@ -330,6 +368,44 @@ export default function EditTrivia() {
                     </div>
                 </div>
             )}
+
+            {confirmSubmitOpen && (
+                <div className="modal-overlay" onClick={() => setConfirmSubmitOpen(false)}>
+                    <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+                        <h2>Finalize Trivia?</h2>
+                        <p>
+                            Once submitted, you won’t be able to edit this trivia anymore.
+                            Are you sure you want to continue?
+                        </p>
+                        <div className="modal-actions">
+                            <button className="cancel-btn" onClick={() => setConfirmSubmitOpen(false)}>Cancel</button>
+                            <button
+                                className="save-btn"
+                                onClick={async () => {
+                                    if (!trivia) return;
+                                    setConfirmSubmitOpen(false);
+                                    setSubmitMessage('Finalizing trivia...');
+                                    setLoading(true);
+                                    try {
+                                        await updateTriviaStatus(trivia.id, 'completed');
+                                        setTimeout(() => {
+                                            router.push(prevPagePath);
+                                        }, 1500);
+                                    } catch {
+                                        setSubmitMessage('Failed to finalize trivia.');
+                                        setTimeout(() => setSubmitMessage(null), 4000);
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                            >
+                                Yes, Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

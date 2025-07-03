@@ -49,7 +49,7 @@ export default function CreateEditTrivias() {
 
     const counts = Object.values(categoryMap);
     const isUniform = counts.every((count) => count === counts[0]);
-    
+
     return isUniform && counts.length > 0 && counts[0] > 0;
   };
 
@@ -102,7 +102,7 @@ export default function CreateEditTrivias() {
 
   return (
     <div className="cet-container">
-      <h1 className="cet-title">Create or Edit Trivia</h1>
+      <h1 className="cet-title">Create, Edit, or Share a Trivia!</h1>
       <p className="cet-subtext">
         Design new trivia games or update ones you’ve already created.
       </p>
@@ -122,10 +122,12 @@ export default function CreateEditTrivias() {
               <h2>{game.title}</h2>
               <p>Status: {game.status}</p>
               <div className="cet-card-actions">
-                <button onClick={() => router.push(`./edit/${game.id}`)}>✏️ Edit</button>
+                {game.status !== 'completed' && (
+                  <button onClick={() => router.push(`./edit/${game.id}`)}>✏️ Edit</button>
+                )}
                 <button onClick={() => console.log(`Delete ${game.id}`)}>🗑️ Delete</button>
                 <button
-                  disabled={!canBeShared(game.content)}
+                  disabled={game.status !== 'completed'}
                   onClick={() => console.log(`Share ${game.id}`)}
                 >
                   📤 Share

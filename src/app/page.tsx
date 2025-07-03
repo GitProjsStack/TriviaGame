@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../app/supabase/supabaseClient';
 import '../app/cssStyling/homepagestyling.css';
@@ -14,6 +14,11 @@ export default function Home() {
   const [authType, setAuthType] = useState<'signup' | 'login'>('login');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    setError('');
+    setSuccessMsg('');
+  }, [authType]);
 
   const handleAuth = async () => {
     setError('');
@@ -54,13 +59,18 @@ export default function Home() {
         setError(loginError.message);
       } else if (user) {
         setSuccessMsg('Login successful! Redirecting...');
-        setTimeout(() => router.push('/dashboard'), 1500);
+        setTimeout(() => router.push('./triviaPages/dashboard'), 1500);
       }
     }
   };
 
   return (
     <div className="trivia-container">
+      <img
+        src="/triviagame-logo.png"
+        alt="TriviaShare Logo"
+        className="trivia-logo"
+      />
       <h1 className="trivia-title">TriviaShare</h1>
 
       {authType === 'signup' && (

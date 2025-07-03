@@ -1,12 +1,15 @@
 import { supabase } from '../supabase/supabaseClient';
 
 export const CLIENTS_TABLE = 'clients';
-export const TRIVIA_TABLE = 'triviagames';
-export const COL_CREATOR_ID = 'creator_id';
-export const COL_TITLE = 'title';
-export const COL_STATUS = 'status';
-export const COL_CONTENT = 'content';
 export const COL_MY_TRIVIA = 'my_trivia_games';
+export const COL_CREATOR_ID = 'creator_id';
+
+export const TRIVIA_TABLE = 'triviagames';
+export const COL_TRIVIA_ID = 'id';
+export const COL_TRIVIA_TITLE = 'title';
+export const COL_TRIVIA_STATUS = 'status';
+export const COL_TRIVIA_CONTENT = 'content';
+export const COL_TRIVIA_CREATED_AT = 'created_at';
 export const ALL = '*';
 
 // Get current logged-in user
@@ -19,7 +22,7 @@ export async function getAuthenticatedUser() {
   return user;
 }
 
-// Get list of Trivia games for a user
+// Get list of Trivia games for a user - ordered by creation time (timestamp)
 export async function getMyTriviaGames(userId: string) {
   const { data: clientData, error: clientError } = await supabase
     .from(CLIENTS_TABLE)
@@ -34,25 +37,30 @@ export async function getMyTriviaGames(userId: string) {
 
   const { data: triviaData, error: triviaError } = await supabase
     .from(TRIVIA_TABLE)
-    .select('id, title, status, content')
-    .in('id', triviaIds);
+    .select(ALL)
+    .in(COL_TRIVIA_ID, triviaIds)
+    .order(COL_TRIVIA_CREATED_AT, { ascending: true });
 
   if (triviaError || !triviaData) return [];
 
   return triviaData;
 }
 
-// Create a new empty trivia game and return inserted ID
+// Create a new empty trivia game and return inserted ID and timestamp
 export async function createTriviaGame(trivia: {
   creator_id: string;
   title: string;
   status: string;
   content: any;
-}): Promise<{ success: boolean; triviaId?: string; error?: string }> {
-  const { data, error } = await supabase.from(TRIVIA_TABLE).insert([trivia]).select('id').single();
+}): Promise<{ success: boolean; triviaId?: string; createdAt?: string; error?: string }> {
+  const { data, error } = await supabase
+    .from(TRIVIA_TABLE)
+    .insert([trivia])
+    .select('id, created_at')
+    .single();
 
   if (error || !data) return { success: false, error: error?.message || 'Unknown error' };
-  return { success: true, triviaId: data.id };
+  return { success: true, triviaId: data.id, createdAt: data.created_at };
 }
 
 // Add a trivia id to client's my_trivia_games array
@@ -121,4 +129,14 @@ export async function updateTriviaStatus(triviaId: string, status: string) {
     }
 
     return data;
+}
+
+export async function deleteTriviaById(triviaId: string): Promise<{ success: boolean; error?: string }> {
+  const { error } = await supabase
+    .from(TRIVIA_TABLE)
+    .delete()
+    .eq(COL_TRIVIA_ID, triviaId);
+
+  if (error) return { success: false, error: error.message };
+  return { success: true };
 }

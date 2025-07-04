@@ -10,6 +10,7 @@ import {
 import { Question, TriviaGame } from '../../../interfaces/triviaTypes';
 import '../../../cssStyling/editTriviastyling.css';
 
+const MAX_POINTS_PER_QUESTION = 10000; // Maximum points allowed per question
 const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
 const generateChoice = () => ({ id: crypto.randomUUID(), text: '' });
@@ -32,6 +33,8 @@ export default function EditTrivia() {
     const [newQuestionText, setNewQuestionText] = useState('');
     const [newChoices, setNewChoices] = useState([generateChoice(), generateChoice()]);
     const [newPoints, setNewPoints] = useState<number | null>(null);
+
+    const [pointsError, setPointsError] = useState<string | null>(null);
 
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
     const [formError, setFormError] = useState<string | null>(null);
@@ -92,6 +95,7 @@ export default function EditTrivia() {
         });
 
         const correctIndex = filledChoices.findIndex((c) => c.id === selectedAnswerId);
+        
         if (newPoints === null || isNaN(newPoints) || newPoints <= 0)
             return setFormError('Please enter a valid number of points.');
 
@@ -193,9 +197,9 @@ export default function EditTrivia() {
         }
 
         for (const [cat, questions] of Object.entries(trivia.content)) {
-            if (questions.length === 0 || questions.length > 9) {
-                setSubmitMessage(`Category "${cat}" must have between 1 and 9 questions.`);
-                setSubmitMessage(null)
+            if (questions.length < 1 || questions.length > 10) {
+                setSubmitMessage(`Category "${cat}" must have between 1 and 10 questions.`);
+                setTimeout(() => setSubmitMessage(null), 4000);
                 return;
             }
         }
@@ -304,10 +308,53 @@ export default function EditTrivia() {
                                 type="number"
                                 className="points-input"
                                 value={newPoints !== null ? newPoints : ''}
-                                onChange={(e) => setNewPoints(parseInt(e.target.value))}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    // Clear previous errors
+                                    setPointsError(null);
+
+                                    // Handle empty input
+                                    if (value === '') {
+                                        setNewPoints(null);
+                                        return;
+                                    }
+
+                                    // Parse as number
+                                    const num = parseInt(value, 10);
+
+                                    // Validate
+                                    if (isNaN(num)) {
+                                        setPointsError('Please enter a valid number');
+                                        return;
+                                    }
+
+                                    if (num > Number.MAX_SAFE_INTEGER) {
+                                        setPointsError('Number is too large');
+                                        return;
+                                    }
+
+                                    if (num <= 0) {
+                                        setPointsError('Points must be at least 1');
+                                        return;
+                                    }
+
+                                    if (num > MAX_POINTS_PER_QUESTION) {
+                                        setPointsError(`Maximum ${MAX_POINTS_PER_QUESTION} points allowed`);
+                                        return;
+                                    }
+
+                                    setNewPoints(num);
+                                }}
                                 min={1}
+                                max={MAX_POINTS_PER_QUESTION} // Visual hint for browsers
                             />
                         </label>
+                        {pointsError && (
+                            <div className="points-error-message">
+                                {pointsError}
+                            </div>
+                        )}
 
                         {newChoices.map((c, i) => (
                             <div key={c.id} className="choice-input-row">

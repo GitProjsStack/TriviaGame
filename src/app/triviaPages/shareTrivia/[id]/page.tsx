@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
+import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import {
     generateUSERProfilePicSignedUrl,
     fetchMatchingUsersBySimilarName,
@@ -156,7 +156,7 @@ export default function ShareTriviaPage() {
                         className="share-button-container share-back-button"
                         onClick={() => router.push('../dashboard')}
                     >
-                        Back to Dashboard
+                        {BUTTON_LABELS.BACK_TO_DASHBOARD}
                     </button>
                 </main>
             )}

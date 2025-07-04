@@ -1,0 +1,246 @@
+/* Container with radiant purple gradient and centered content */
+.end-screen-container {
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #6a11cb, #2575fc);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    font-family: 'Poppins', sans-serif;
+    color: #f0e9ff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Main title - bold, glowing */
+.end-screen-title {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #fff;
+    text-shadow:
+        0 0 10px #fff,
+        0 0 20px #b388ff,
+        0 0 30px #7e57c2,
+        0 0 40px #7e57c2,
+        0 0 70px #7e57c2;
+}
+
+/* Winner message styling */
+.winner-message,
+.tie-message {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: #ffe066;
+    text-shadow:
+        0 0 10px #fff176,
+        0 0 20px #ffd54f,
+        0 0 30px #ffca28,
+        0 0 40px #ffc107;
+}
+
+/* Highlight winner name */
+.winner-name {
+    color: #ffeb3b;
+    text-shadow:
+        0 0 10px #fff176,
+        0 0 20px #ffeb3b,
+        0 0 30px #fffde7;
+}
+
+/* Podium container with spacing */
+.podium {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 4rem;
+}
+
+/* Podium spot base style */
+.podium-spot {
+    position: relative;
+    width: 160px;
+    border-radius: 15px 15px 0 0;
+    box-shadow:
+        0 0 15px rgba(255, 255, 255, 0.4),
+        inset 0 -5px 10px rgba(255, 255, 255, 0.3);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 1.5rem;
+    font-weight: 700;
+    cursor: default;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect - lift and glow */
+.podium-spot:hover {
+    transform: translateY(-12px) scale(1.05);
+    box-shadow:
+        0 0 25px #fff,
+        0 0 50px #ffd600,
+        inset 0 -5px 15px #fff9c4;
+    z-index: 10;
+}
+
+/* Podium rank number */
+.podium-rank {
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-shadow:
+        0 0 5px #ffeb3b,
+        0 0 10px #ffeb3b;
+    margin-bottom: 0.25rem;
+}
+
+/* Player name */
+.podium-player-name {
+    font-size: 1.6rem;
+    margin-bottom: 0.15rem;
+    letter-spacing: 0.05em;
+}
+
+/* Score text */
+.podium-score {
+    font-size: 1.15rem;
+    opacity: 0.85;
+}
+
+/* Podium spot heights - 1st place tallest */
+.spot-1 {
+    height: 260px;
+    background: linear-gradient(180deg, #ffd600, #fbc02d);
+    box-shadow:
+        0 0 30px #fff176,
+        0 0 50px #fbc02d,
+        inset 0 0 40px #fffde7;
+    z-index: 30;
+    border: 3px solid #fbc02d;
+}
+
+/* 2nd place - middle height */
+.spot-2 {
+    height: 200px;
+    background: linear-gradient(180deg, #90caf9, #42a5f5);
+    box-shadow:
+        0 0 20px #64b5f6,
+        inset 0 0 25px #bbdefb;
+    z-index: 20;
+    border: 3px solid #42a5f5;
+}
+
+/* 3rd place - shortest */
+.spot-3 {
+    height: 160px;
+    background: linear-gradient(180deg, #ce93d8, #ab47bc);
+    box-shadow:
+        0 0 15px #ba68c8,
+        inset 0 0 20px #e1bee7;
+    z-index: 10;
+    border: 3px solid #ab47bc;
+}
+
+/* Glow pulse animation for winner spots */
+.winner-spot {
+    animation: winnerGlow 2.5s ease-in-out infinite;
+    box-shadow:
+        0 0 40px #fff59d,
+        0 0 60px #fff176,
+        0 0 80px #fbc02d,
+        inset 0 0 30px #fffde7;
+}
+
+@keyframes winnerGlow {
+    0%, 100% {
+        box-shadow:
+            0 0 40px #fff59d,
+            0 0 60px #fff176,
+            0 0 80px #fbc02d,
+            inset 0 0 30px #fffde7;
+    }
+    50% {
+        box-shadow:
+            0 0 60px #fff9c4,
+            0 0 80px #fff176,
+            0 0 100px #fdd835,
+            inset 0 0 50px #fffde7;
+    }
+}
+
+/* Buttons container */
+.end-screen-buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Base button style */
+.btn {
+    flex: 1;
+    background: linear-gradient(45deg, #7e57c2, #5e35b1);
+    border: none;
+    border-radius: 50px;
+    padding: 1rem 1.5rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow:
+        0 4px 15px rgba(126, 87, 194, 0.6),
+        inset 0 -3px 6px rgba(255, 255, 255, 0.3);
+    transition: background 0.3s ease, transform 0.15s ease;
+    user-select: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Hover and focus effects */
+.btn:hover,
+.btn:focus {
+    background: linear-gradient(45deg, #9575cd, #7e57c2);
+    transform: scale(1.05);
+    box-shadow:
+        0 6px 20px rgba(149, 117, 205, 0.8),
+        inset 0 -5px 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Restart button special color */
+.restart-btn {
+    background: linear-gradient(45deg, #43a047, #388e3c);
+    box-shadow:
+        0 4px 15px rgba(67, 160, 71, 0.6),
+        inset 0 -3px 6px rgba(255, 255, 255, 0.3);
+}
+
+.restart-btn:hover,
+.restart-btn:focus {
+    background: linear-gradient(45deg, #66bb6a, #4caf50);
+    box-shadow:
+        0 6px 20px rgba(102, 187, 106, 0.8),
+        inset 0 -5px 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Dashboard button special color */
+.dashboard-btn {
+    background: linear-gradient(45deg, #f4511e, #d84315);
+    box-shadow:
+        0 4px 15px rgba(244, 81, 30, 0.6),
+        inset 0 -3px 6px rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-btn:hover,
+.dashboard-btn:focus {
+    background: linear-gradient(45deg, #fb8c00, #ef6c00);
+    box-shadow:
+        0 6px 20px rgba(251, 140, 0, 0.8),
+        inset 0 -5px 8px rgba(255, 255, 255, 0.4);
+}

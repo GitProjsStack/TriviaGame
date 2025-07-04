@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { TPlayer } from '@/app/interfaces/triviaTypes';
 import { getWinners } from '@/app/components/getWinners';
 import '../../cssStyling/triviaEndScreen.css';
+import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
 interface TriviaEndScreenProps {
     players: TPlayer[];
@@ -56,7 +57,7 @@ export default function TriviaEndScreen({ players, triviaId }: TriviaEndScreenPr
 
             <div className="end-screen-buttons">
                 <button className="btn dashboard-btn" onClick={goToDashboard}>
-                    Back to Dashboard
+                    {BUTTON_LABELS.BACK_TO_DASHBOARD}
                 </button>
             </div>
         </div>

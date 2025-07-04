@@ -1,0 +1,291 @@
+.play-container {
+  max-width: 900px;
+  margin: 1rem auto 3rem;
+  padding: 1rem 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+.play-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.trivia-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #db2777;
+}
+
+.players-row {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.player-box {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 0.6rem 1rem;
+  width: 140px;
+  box-shadow: 0 4px 8px rgb(253 224 71 / 0.4);
+  transition: transform 0.3s ease;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-box.active-player {
+  border-color: #db2777;
+  box-shadow: 0 6px 16px rgba(219, 39, 119, 0.6);
+  transform: scale(1.05);
+}
+
+.player-name-input {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  font-size: 1rem;
+  border: 1.5px solid #fbbf24;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 0.4rem;
+  outline-offset: 2px;
+  transition: border-color 0.3s ease;
+}
+
+.player-name-input:focus {
+  border-color: #db2777;
+  background-color: #fff0f6;
+}
+
+.player-score {
+  font-weight: 600;
+  color: #b45309;
+}
+
+.players-input-box {
+  display: flex;
+  flex-direction: column; 
+  align-items: center; 
+  gap: 0.75rem; 
+  margin: 2rem 0;
+}
+
+.players-input-box label {
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+}
+
+.players-input-box input[type='number'] {
+  width: 60px;
+  padding: 0.3rem 0.4rem;
+  font-size: 1.1rem;
+  border: 1.5px solid #f59e0b;
+  border-radius: 6px;
+  margin-right: 1rem;
+  text-align: center;
+}
+
+.start-btn {
+  padding: 0.5rem 1.4rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background-color: #db2777;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(219, 39, 119, 0.7);
+  transition: background-color 0.3s ease;
+}
+
+.start-btn:hover {
+  background-color: #be185d;
+}
+
+.trivia-grid {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.category-column {
+  background: #fefce8;
+  border: 2px solid #fde68a;
+  border-radius: 16px;
+  padding: 1rem 1.3rem;
+  min-width: 180px;
+  max-width: 220px;
+  box-shadow: 0 6px 14px rgb(252 211 77 / 0.4);
+}
+
+.category-name {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #b45309;
+  text-align: center;
+}
+
+.question-button {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.8rem;
+  padding: 0.6rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #fbbf24;
+  background: #fff7ed;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.question-button:hover {
+  background-color: #fde68a;
+}
+
+/* Modal */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 90%;
+  padding: 1.8rem 2rem;
+  box-shadow: 0 12px 30px rgba(219, 39, 119, 0.25);
+  user-select: none;
+}
+
+#modal-question {
+  margin-bottom: 1.2rem;
+  color: #db2777;
+  font-weight: 700;
+}
+
+.choices-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.choice-button {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #fbbf24;
+  background: #fff7ed;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.25s ease;
+}
+
+.choice-button:hover:not(:disabled) {
+  background-color: #fde68a;
+}
+
+.choice-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.modal-message {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #16a34a; /* green for positive, override in JS if needed */
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.25s ease;
+  color: white;
+}
+
+.modal-btn.give-up {
+  background-color: #ef4444;
+}
+
+.modal-btn.give-up:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.modal-btn.steal {
+  background-color: #2563eb;
+}
+
+.modal-btn.steal:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.play-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative; /* to help position the button if needed */
+}
+
+.quit-btn {
+  margin: 0 auto 1.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #f97316;             /* orange same as dashboard headings */
+  background-color: #fff7ed;  /* soft warm off-white */
+  border: 3px solid #fcd34d;  /* golden border */
+  border-radius: 24px;
+  box-shadow: 0 8px 25px rgba(252, 211, 77, 0.25);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  display: inline-block;
+  text-align: center;
+  user-select: none;
+}
+
+.quit-btn:hover {
+  background-color: #fef3c7;  /* slightly lighter */
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(253, 224, 71, 0.35);
+}
+
+.quit-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 6px 18px rgba(253, 224, 71, 0.25);
+}
+

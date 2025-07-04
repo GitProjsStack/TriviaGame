@@ -10,7 +10,7 @@ import {
     TChoice,
     TriviaParams
 } from '@/app/interfaces/triviaTypes';
-import '@app/styles/playTriviaPage.css';
+import '../../../cssStyling/playTrivia.css';
 
 export default function PlayTriviaPage() {
     const router = useRouter();
@@ -21,6 +21,7 @@ export default function PlayTriviaPage() {
     const [triviaContent, setTriviaContent] = useState<TContent | null>(null);
 
     const [numPlayers, setNumPlayers] = useState('');
+    // Players now have customizable names defaulting to empty strings
     const [players, setPlayers] = useState<TPlayer[]>([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
 
@@ -50,17 +51,30 @@ export default function PlayTriviaPage() {
         })();
     }, [id, router]);
 
-    // Start game handler
+    // Start game handler, initializes players with empty names and scores
     function startGame() {
         const n = Number(numPlayers);
         if (isNaN(n) || n < 2 || n > 10) {
             alert('Please enter a number of players between 2 and 10');
             return;
         }
-        const initialPlayers = Array.from({ length: n }, (_, i) => ({ id: i + 1, score: 0 }));
+        const initialPlayers = Array.from({ length: n }, (_, i) => ({
+            id: i + 1,
+            name: '',      // empty default player names
+            score: 0,
+        }));
         setPlayers(initialPlayers);
         setCurrentPlayerIndex(0);
         setShowGame(true);
+    }
+
+    // Update player name dynamically
+    function updatePlayerName(index: number, newName: string) {
+        setPlayers((prev) => {
+            const copy = [...prev];
+            copy[index].name = newName;
+            return copy;
+        });
     }
 
     // Handle question click to open modal
@@ -80,7 +94,7 @@ export default function PlayTriviaPage() {
         setCurrentPlayerIndex((prev) => (prev + 1) % players.length);
     }
 
-    // Close modal and move on
+    // Close modal and reset modal state
     function closeModal() {
         setModalOpen(false);
         setModalQuestion(null);
@@ -101,12 +115,12 @@ export default function PlayTriviaPage() {
         }, 1500);
     }
 
-    // When "Steal" clicked: call your placeholder function (to be implemented)
+    // Placeholder for Steal feature
     function handleSteal() {
         alert('Steal functionality not yet implemented.');
     }
 
-    // When a choice is clicked
+    // When a choice is clicked, award points and proceed
     function handleChoiceClick(choice: TChoice) {
         if (questionAnswered) return;
         if (modalQuestionIndex === null || modalCategoryIndex === null || !triviaContent) return;
@@ -140,6 +154,13 @@ export default function PlayTriviaPage() {
         <div className="play-container">
             <header className="play-header">
                 <h1 className="trivia-title">{triviaTitle}</h1>
+                <button
+                    className="quit-btn"
+                    onClick={() => router.push('../dashboard')}
+                    aria-label="Quit Trivia and return to dashboard"
+                >
+                    Quit Trivia and Return to Dashboard
+                </button>
                 {showGame && (
                     <div className="players-row">
                         {players.map((p, i) => (
@@ -147,8 +168,14 @@ export default function PlayTriviaPage() {
                                 key={p.id}
                                 className={`player-box ${i === currentPlayerIndex ? 'active-player' : ''}`}
                             >
-                                Player {p.id} <br />
-                                Score: {p.score}
+                                <input
+                                    type="text"
+                                    className="player-name-input"
+                                    placeholder={`Player ${p.id} name`}
+                                    value={p.name}
+                                    onChange={(e) => updatePlayerName(i, e.target.value)}
+                                />
+                                <div className="player-score">Score: {p.score}</div>
                             </div>
                         ))}
                     </div>
@@ -157,22 +184,22 @@ export default function PlayTriviaPage() {
 
             {!showGame ? (
                 <div className="players-input-box">
-                    <label htmlFor="numPlayers">Number of players (2-10): </label>
+                    <label htmlFor="numPlayers">Number of players: {numPlayers || 2}</label>
                     <input
                         id="numPlayers"
-                        type="number"
+                        type="range"
                         min={2}
                         max={10}
-                        value={numPlayers}
+                        value={numPlayers || '2'}
                         onChange={(e) => setNumPlayers(e.target.value)}
                     />
                     <button className="start-btn" onClick={startGame}>
-                        Play game with {numPlayers || '?'} players
+                        Start Game
                     </button>
                 </div>
             ) : (
                 <div className="trivia-grid">
-                    {triviaContent?.categories.map((category, catIdx) => (
+                    {triviaContent && Array.isArray(triviaContent.categories) && triviaContent.categories.map((category, catIdx) => (
                         <div key={category.name} className="category-column">
                             <h3 className="category-name">{category.name}</h3>
                             {category.questions.map((question, qIdx) => (

@@ -40,13 +40,15 @@ This project is primarily designed to run as a deployed web app accessible throu
 If you want to try it locally, clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/TriviaShare.git
+git clone https://github.com/GitProjsStack/TriviaShare.git
 cd TriviaShare
 npm install
 npm run dev
+```
 
-Remember to create a local .env.local file with:
+Remember to create a local *`.env.local`* file with:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```

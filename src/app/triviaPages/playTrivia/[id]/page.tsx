@@ -10,6 +10,13 @@ import {
     TriviaContent,
     TriviaParams
 } from '@/app/interfaces/triviaTypes';
+import {
+    initStealQueue,
+    getCurrentStealer,
+    advanceStealTurn,
+    isStealOver,
+    evaluateStealAnswer,
+} from '@/app/components/stealQuestionImplementation';
 import '../../../cssStyling/viewSharedTrivias.css';
 import '../../../cssStyling/playTrivia.css';
 
@@ -27,11 +34,16 @@ export default function PlayTriviaPage() {
     const [numPlayers, setNumPlayers] = useState('');
     const [players, setPlayers] = useState<TPlayer[]>([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+    const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, Set<number>>>({});
 
     const [showGame, setShowGame] = useState(false);
-    const [canStartGame, setCanStartGame] = useState(false);
+    const [stealPhase, setStealPhase] = useState(false);
+    const [currentStealerIndex, setCurrentStealerIndex] = useState<number | null>(null);
+    const [showStealChooser, setShowStealChooser] = useState(false);
+    const [eligibleStealers, setEligibleStealers] = useState<TPlayer[]>([]);
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalCategory, setModalCategory] = useState<string | null>(null);
     const [modalQuestion, setModalQuestion] = useState<TQuestion | null>(null);
     const [modalQuestionIndex, setModalQuestionIndex] = useState<number | null>(null);
 
@@ -54,12 +66,6 @@ export default function PlayTriviaPage() {
             setTriviaContent(trivia.content);
         })();
     }, [id, router]);
-
-    // Validate player names
-    useEffect(() => {
-        const allNamesValid = players.length > 0 && players.every(p => p.name.trim().length > 0);
-        setCanStartGame(allNamesValid);
-    }, [players]);
 
     function showUIMessage(message: string, duration: number = 1000) {
         setUiMessage(message);
@@ -118,11 +124,21 @@ export default function PlayTriviaPage() {
             })),
         };
 
+        setModalCategory(categoryName);
         setModalQuestion(convertedQuestion);
         setModalQuestionIndex(questionIdx);
         setModalMessage('');
         setQuestionAnswered(false);
         setModalOpen(true);
+    }
+
+    function markQuestionAnswered(categoryName: string, questionIdx: number) {
+        setAnsweredQuestions((prev) => {
+            const updated = { ...prev };
+            if (!updated[categoryName]) updated[categoryName] = new Set();
+            updated[categoryName].add(questionIdx);
+            return updated;
+        });
     }
 
     function nextPlayer() {
@@ -139,16 +155,61 @@ export default function PlayTriviaPage() {
 
     function handleGiveUp() {
         if (questionAnswered) return;
-        setModalMessage('No points awarded. Moving to next player.');
+
+        // Show manual steal chooser
+        const others = players.filter((_, i) => i !== currentPlayerIndex);
+        setEligibleStealers(others);
+        setShowStealChooser(true);
         setQuestionAnswered(true);
-        setTimeout(() => {
-            closeModal();
-            nextPlayer();
-        }, 1500);
+        setModalMessage(`Choose a player to attempt stealing.`);
     }
 
-    function handleSteal() {
-        showUIMessage('Steal functionality not yet implemented.');
+    function handleSteal(choice: TChoice) {
+        if (!stealPhase || currentStealerIndex === null || !modalQuestion) return;
+
+        const result = evaluateStealAnswer(players, modalQuestion.points, currentStealerIndex, choice.isCorrect);
+
+        setPlayers(result.updatedPlayers);
+        setModalMessage(result.message);
+
+        if (result.isStealSuccess) {
+            if (modalCategory && modalQuestionIndex !== null) {
+                markQuestionAnswered(modalCategory, modalQuestionIndex);
+            }
+            setTimeout(() => {
+                closeModal();
+                setStealPhase(false);
+                setCurrentStealerIndex(null);
+                setCurrentPlayerIndex(result.nextTurnIndex);
+            }, 1500);
+        } else {
+            advanceStealTurn();
+            if (isStealOver()) {
+                setTimeout(() => {
+                    closeModal();
+                    setStealPhase(false);
+                    setCurrentStealerIndex(null);
+                    setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
+                }, 1500);
+            } else {
+                const nextStealer = getCurrentStealer();
+                setTimeout(() => {
+                    setCurrentStealerIndex(nextStealer);
+                    setModalMessage(`${players[nextStealer].name} can now try to steal!`);
+                }, 1500);
+            }
+        }
+    }
+
+    function handleManualStealPick(playerId: number) {
+        const chosenIndex = players.findIndex(p => p.id === playerId);
+        if (chosenIndex === -1) return;
+
+        setShowStealChooser(false);
+        setStealPhase(true);
+        setCurrentStealerIndex(chosenIndex);
+        setModalMessage('');
+        setQuestionAnswered(false);
     }
 
     function handleChoiceClick(choice: TChoice) {
@@ -165,6 +226,10 @@ export default function PlayTriviaPage() {
                 return newPlayers;
             });
 
+            if (modalCategory && modalQuestionIndex !== null) {
+                markQuestionAnswered(modalCategory, modalQuestionIndex);
+            }
+
             setTimeout(() => {
                 closeModal();
                 nextPlayer();
@@ -172,10 +237,11 @@ export default function PlayTriviaPage() {
         } else {
             setModalMessage('Incorrect. No points awarded.');
             setQuestionAnswered(true);
-            setTimeout(() => {
-                closeModal();
-                nextPlayer();
-            }, 1500);
+
+            // Show manual steal chooser instead of auto steal queue
+            const others = players.filter((_, i) => i !== currentPlayerIndex);
+            setEligibleStealers(others);
+            setShowStealChooser(true);
         }
     }
 
@@ -272,8 +338,9 @@ export default function PlayTriviaPage() {
                                     .map((question, qIdx) => (
                                         <button
                                             key={`${categoryName}-${qIdx}`}
-                                            className="question-button"
+                                            className={`question-button ${answeredQuestions[categoryName]?.has(qIdx) ? 'answered' : ''}`}
                                             onClick={() => openQuestionModal(categoryName, qIdx)}
+                                            disabled={answeredQuestions[categoryName]?.has(qIdx)}
                                         >
                                             {question.points} pts
                                         </button>
@@ -296,27 +363,45 @@ export default function PlayTriviaPage() {
                         aria-labelledby="modal-question"
                     >
                         <h2 id="modal-question">{modalQuestion.question}</h2>
-                        <div className="choices-container">
-                            {modalQuestion.choices.map((choice, idx) => (
-                                <button
-                                    key={idx}
-                                    className="choice-button"
-                                    onClick={() => handleChoiceClick(choice)}
-                                    disabled={questionAnswered}
-                                >
-                                    {choice.text}
-                                </button>
-                            ))}
-                        </div>
+                        {showStealChooser ? (
+                            <div className="steal-chooser">
+                                <p>Select a player to steal the question:</p>
+                                <div className="steal-chooser-list">
+                                    {eligibleStealers.map(p => (
+                                        <button
+                                            key={p.id}
+                                            className="steal-chooser-button"
+                                            onClick={() => handleManualStealPick(p.id)}
+                                        >
+                                            {p.name || `Player ${p.id}`}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="choices-container">
+                                {modalQuestion.choices.map((choice, idx) => (
+                                    <button
+                                        key={idx}
+                                        className="choice-button"
+                                        onClick={() =>
+                                            stealPhase
+                                                ? handleSteal(choice)
+                                                : handleChoiceClick(choice)
+                                        }
+                                        disabled={questionAnswered}
+                                    >
+                                        {choice.text}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
 
                         {modalMessage && <p className="modal-message">{modalMessage}</p>}
 
                         <div className="modal-buttons">
                             <button className="modal-btn give-up" onClick={handleGiveUp} disabled={questionAnswered}>
                                 I Give Up
-                            </button>
-                            <button className="modal-btn steal" onClick={handleSteal} disabled={questionAnswered}>
-                                Steal
                             </button>
                         </div>
                     </div>

@@ -299,3 +299,29 @@
   font-size: 1rem;
   color: #78350f;
 }
+
+.question-button.answered {
+    text-decoration: line-through;
+    color: #888;
+    cursor: not-allowed;
+    background-color: #eee;
+}
+
+.steal-chooser-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.steal-chooser-button {
+    background-color: #db2777;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.4rem;
+    cursor: pointer;
+}
+
+.steal-chooser-button:hover {
+    background-color: #be185d;
+}

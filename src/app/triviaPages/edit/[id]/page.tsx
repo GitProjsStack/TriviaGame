@@ -7,18 +7,9 @@ import {
     updateTriviaContent,
     updateTriviaStatus
 } from '../../../supabasefuncs/helperSupabaseFuncs';
+import { BUTTON_LABELS, EDIT_TRIVIA_LIMITS } from '@/app/constants/gameSettings';
 import { Question, TriviaGame } from '../../../interfaces/triviaTypes';
 import '../../../cssStyling/editTriviastyling.css';
-
-// Trivia editing constants — keeps trivia creation structured and prevents abuse
-const MAX_POINTS_PER_QUESTION = 10000;
-const MIN_POINTS_PER_QUESTION = 1;
-const MAX_CHOICES = 6;
-const MIN_CHOICES = 2;
-const MAX_QUESTIONS_PER_CATEGORY = 10;
-const MIN_QUESTIONS_PER_CATEGORY = 1;
-const MAX_CATEGORIES = 10;
-const MIN_CATEGORIES = 1;
 
 const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
@@ -69,13 +60,13 @@ export default function EditTrivia() {
     };
 
     const addChoice = () => {
-        if (newChoices.length < MAX_CHOICES) {
+        if (newChoices.length < EDIT_TRIVIA_LIMITS.MAX_CHOICES) {
             setNewChoices((prev) => [...prev, generateChoice()]);
         }
     };
 
     const removeChoice = (id: string) => {
-        if (newChoices.length <= MIN_CHOICES) return;
+        if (newChoices.length <= EDIT_TRIVIA_LIMITS.MIN_CHOICES) return;
         setNewChoices((prev) => prev.filter((c) => c.id !== id));
         if (selectedAnswerId === id) setSelectedAnswerId(null);
     };
@@ -201,15 +192,15 @@ export default function EditTrivia() {
         if (!trivia) return;
 
         const categoryCount = Object.keys(trivia.content).length;
-        if (categoryCount === 0 || categoryCount > MAX_CATEGORIES) {
-            setSubmitMessage(`Trivia must have between ${MIN_CATEGORIES} and ${MAX_CATEGORIES} categories.`);
+        if (categoryCount === 0 || categoryCount > EDIT_TRIVIA_LIMITS.MAX_CATEGORIES) {
+            setSubmitMessage(`Trivia must have between ${EDIT_TRIVIA_LIMITS.MIN_CATEGORIES} and ${EDIT_TRIVIA_LIMITS.MAX_CATEGORIES} categories.`);
             setTimeout(() => setSubmitMessage(null), 4000);
             return;
         }
 
         for (const [cat, questions] of Object.entries(trivia.content)) {
-            if (questions.length < MIN_QUESTIONS_PER_CATEGORY || questions.length > MAX_QUESTIONS_PER_CATEGORY) {
-                setSubmitMessage(`Category "${cat}" must have between ${MIN_QUESTIONS_PER_CATEGORY} and ${MAX_QUESTIONS_PER_CATEGORY} questions.`);
+            if (questions.length < EDIT_TRIVIA_LIMITS.MIN_QUESTIONS_PER_CATEGORY || questions.length > EDIT_TRIVIA_LIMITS.MAX_QUESTIONS_PER_CATEGORY) {
+                setSubmitMessage(`Category "${cat}" must have between ${EDIT_TRIVIA_LIMITS.MIN_QUESTIONS_PER_CATEGORY} and ${EDIT_TRIVIA_LIMITS.MAX_QUESTIONS_PER_CATEGORY} questions.`);
                 setTimeout(() => setSubmitMessage(null), 4000);
                 return;
             }
@@ -347,19 +338,19 @@ export default function EditTrivia() {
                                     }
 
                                     if (num <= 0) {
-                                        setPointsError(`Each question must have a minimum of ${MIN_POINTS_PER_QUESTION} point(s)`);
+                                        setPointsError(`Each question must have a minimum of ${EDIT_TRIVIA_LIMITS.MIN_POINTS_PER_QUESTION} point(s)`);
                                         return;
                                     }
 
-                                    if (num > MAX_POINTS_PER_QUESTION) {
-                                        setPointsError(`Maximum ${MAX_POINTS_PER_QUESTION} points allowed`);
+                                    if (num > EDIT_TRIVIA_LIMITS.MAX_POINTS_PER_QUESTION) {
+                                        setPointsError(`Maximum ${EDIT_TRIVIA_LIMITS.MAX_POINTS_PER_QUESTION} points allowed`);
                                         return;
                                     }
 
                                     setNewPoints(num);
                                 }}
-                                min={MIN_POINTS_PER_QUESTION}
-                                max={MAX_POINTS_PER_QUESTION} // Visual hint for browsers
+                                min={EDIT_TRIVIA_LIMITS.MIN_POINTS_PER_QUESTION}
+                                max={EDIT_TRIVIA_LIMITS.MAX_POINTS_PER_QUESTION} // Visual hint for browsers
                             />
                         </label>
                         {pointsError && (
@@ -391,21 +382,21 @@ export default function EditTrivia() {
                                     onClick={() => removeChoice(c.id)}
                                     className="remove-choice-btn"
                                     type="button"
-                                    disabled={newChoices.length <= MIN_CHOICES}
+                                    disabled={newChoices.length <= EDIT_TRIVIA_LIMITS.MIN_CHOICES}
                                 >
                                     ✕
                                 </button>
                             </div>
                         ))}
 
-                        <button className="add-choice-btn" onClick={addChoice} disabled={newChoices.length >= MAX_CHOICES}>
+                        <button className="add-choice-btn" onClick={addChoice} disabled={newChoices.length >= EDIT_TRIVIA_LIMITS.MAX_CHOICES}>
                             + Add Choice
                         </button>
 
                         {formError && <p className="form-error">{formError}</p>}
 
                         <div className="modal-actions">
-                            <button className="cancel-btn" onClick={() => setModalOpen(false)}>Cancel</button>
+                            <button className="cancel-btn" onClick={() => setModalOpen(false)}>{BUTTON_LABELS.CANCEL}</button>
                             <button className="save-btn" onClick={saveNewQuestion}>Save Question</button>
                         </div>
                     </div>
@@ -430,7 +421,7 @@ export default function EditTrivia() {
                         {categoryError && <p className="form-error">{categoryError}</p>}
 
                         <div className="modal-actions">
-                            <button className="cancel-btn" onClick={() => setCategoryModalOpen(false)}>Cancel</button>
+                            <button className="cancel-btn" onClick={() => setCategoryModalOpen(false)}>{BUTTON_LABELS.CANCEL}</button>
                             <button className="save-btn" onClick={submitNewCategory}>Create Category</button>
                         </div>
                     </div>
@@ -446,7 +437,7 @@ export default function EditTrivia() {
                             Are you sure you want to continue?
                         </p>
                         <div className="modal-actions">
-                            <button className="cancel-btn" onClick={() => setConfirmSubmitOpen(false)}>Cancel</button>
+                            <button className="cancel-btn" onClick={() => setConfirmSubmitOpen(false)}>{BUTTON_LABELS.CANCEL}</button>
                             <button
                                 className="save-btn"
                                 onClick={async () => {

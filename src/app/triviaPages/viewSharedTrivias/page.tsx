@@ -15,6 +15,7 @@ export default function ViewSharedTrivias() {
   const router = useRouter();
   const [sharedTrivias, setSharedTrivias] = useState<SharedTrivia[]>([]);
   const [loading, setLoading] = useState(true);
+  const [playLoadingId, setPlayLoadingId] = useState<string | null>(null);
 
   const fetchSharedTrivias = async () => {
     setLoading(true);
@@ -95,9 +96,14 @@ export default function ViewSharedTrivias() {
               <div className="trivia-right">
                 <button
                   className="rounded-btn play"
-                  onClick={() => router.push(`./playTrivia/${triviaId}`)}
+                  onClick={() => {
+                    setPlayLoadingId(triviaId); // show spinner for this card
+                    setTimeout(() => {
+                      router.push(`./playTrivia/${triviaId}`);
+                    }, 2000); // 2 second delay
+                  }}
                 >
-                  ▶ Play
+                  {playLoadingId === triviaId ? <div className="mini-spinner" /> : '▶ Play'}
                 </button>
                 <button
                   className="rounded-btn delete"

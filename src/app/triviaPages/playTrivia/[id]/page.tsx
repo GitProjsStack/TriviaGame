@@ -11,12 +11,12 @@ import {
     TriviaParams
 } from '@/app/interfaces/triviaTypes';
 import {
-    initStealQueue,
     getCurrentStealer,
     advanceStealTurn,
     isStealOver,
     evaluateStealAnswer,
 } from '@/app/components/stealQuestionImplementation';
+import TriviaEndScreen from '../../triviaEndScreen/page';
 import '../../../cssStyling/viewSharedTrivias.css';
 import '../../../cssStyling/playTrivia.css';
 
@@ -42,6 +42,7 @@ export default function PlayTriviaPage() {
 
     // Game and steal phase flags + tracking current stealer
     const [showGame, setShowGame] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
     const [stealPhase, setStealPhase] = useState(false);
     const [currentStealerIndex, setCurrentStealerIndex] = useState<number | null>(null);
 
@@ -76,6 +77,22 @@ export default function PlayTriviaPage() {
             setTriviaContent(trivia.content);
         })();
     }, [id, router]);
+
+    // Check if all questions have been answered to end the game
+    useEffect(() => {
+        if (!triviaContent) return;
+
+        // Count total questions
+        const totalQuestions = Object.values(triviaContent).reduce((sum, arr) => sum + arr.length, 0);
+
+        // Count answered questions total
+        const totalAnswered = Object.values(answeredQuestions).reduce(
+            (sum, set) => sum + (set ? set.size : 0), 0);
+
+        if (totalAnswered === totalQuestions && totalQuestions > 0) {
+            setGameOver(true);
+        }
+    }, [answeredQuestions, triviaContent]);
 
     // Shows a temporary banner message on UI
     function showUIMessage(message: string, duration: number = 1000) {
@@ -275,166 +292,169 @@ export default function PlayTriviaPage() {
 
     return (
         <div className="dashboard-container">
-            <h1 className="dashboard-title">{triviaTitle}</h1>
-            <p className="dashboard-subtext">
-                {showGame ? (
-                    <>Game in progress!</>
-                ) : (
-                    'Set up your players and start the game!'
-                )}
-            </p>
-
-            <div className="button-row">
-                <button className="dashboard-back-button" onClick={() => router.push('../dashboard')}>
-                    ← Back to Dashboard
-                </button>
-                <button className="dashboard-back-button" onClick={() => router.push('../viewSharedTrivias')}>
-                    Play a different trivia
-                </button>
-            </div>
-
-            {showGame && (
-                <div className="players-scoreboard">
-                    {players.map((p, i) => (
-                        <div
-                            key={p.id}
-                            className={`scoreboard-entry ${i === currentPlayerIndex ? 'active-player' : ''}`}
-                            style={{ borderColor: i === currentPlayerIndex ? '#db2777' : '#fbbf24' }}
-                        >
-                            <span className="scoreboard-name" style={{ color: getPlayerColor(i) }}>
-                                {p.name || `Player ${p.id}`}
-                            </span>
-                            <span className="scoreboard-points">{p.score} pts</span>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {uiMessage && <div className="ui-message-banner">{uiMessage}</div>}
-
-            {!players.length ? (
-                <div className="players-input-box">
-                    <label htmlFor="numPlayers">Number of players: {numPlayers || MIN_PLAYERS}</label>
-                    <input
-                        id="numPlayers"
-                        type="range"
-                        min={MIN_PLAYERS}
-                        max={MAX_PLAYERS}
-                        value={numPlayers || MIN_PLAYERS}
-                        onChange={(e) => setNumPlayers(e.target.value)}
-                    />
-                    <button className="start-btn" onClick={initPlayers}>
-                        Confirm Player Count
-                    </button>
-                </div>
-            ) : !showGame ? (
-                <>
-                    <div className="players-row">
-                        {players.map((p, i) => (
-                            <div
-                                key={p.id}
-                                className={`player-box ${i === currentPlayerIndex ? 'active-player' : ''}`}
-                            >
-                                <input
-                                    type="text"
-                                    className="player-name-input"
-                                    placeholder={`Player ${p.id} name`}
-                                    value={p.name}
-                                    onChange={(e) => updatePlayerName(i, e.target.value)}
-                                />
-                                <div className="player-score">Score: {p.score}</div>
-                            </div>
-                        ))}
-                    </div>
-                    <p className="dashboard-subtext">Please enter a name for each player to begin.</p>
-                    <button
-                        className="start-btn"
-                        onClick={beginGame}
-                        style={{ marginTop: '1rem' }}
-                    >
-                        Start Game
-                    </button>
-                </>
+            {gameOver ? (
+                <TriviaEndScreen players={players} triviaId={id} />
             ) : (
-                triviaContent && Object.keys(triviaContent).length > 0 ? (
-                    <div className="trivia-grid">
-                        {Object.entries(triviaContent).map(([categoryName, questions]) => (
-                            <div key={categoryName} className="category-column">
-                                <h3 className="category-name">{categoryName}</h3>
-                                {[...questions]
-                                    .sort((a, b) => a.points - b.points)
-                                    .map((question, qIdx) => (
-                                        <button
-                                            key={`${categoryName}-${qIdx}`}
-                                            className={`question-button ${answeredQuestions[categoryName]?.has(qIdx) ? 'answered' : ''}`}
-                                            onClick={() => openQuestionModal(categoryName, qIdx)}
-                                            disabled={answeredQuestions[categoryName]?.has(qIdx)}
-                                        >
-                                            {question.points} pts
-                                        </button>
-                                    ))}
-                            </div>
-                        ))}
+                <>
+                    <h1 className="dashboard-title">{triviaTitle}</h1>
+                    <p className="dashboard-subtext">
+                        {showGame ? <>Game in progress!</> : 'Set up your players and start the game!'}
+                    </p>
+
+                    <div className="button-row">
+                        <button
+                            className="dashboard-back-button"
+                            onClick={() => router.push('../dashboard')}
+                        >
+                            ← Back to Dashboard
+                        </button>
+                        <button
+                            className="dashboard-back-button"
+                            onClick={() => router.push('../viewSharedTrivias')}
+                        >
+                            Play a different trivia
+                        </button>
                     </div>
-                ) : (
-                    <p>No trivia categories found.</p>
-                )
-            )}
 
-            {modalOpen && modalQuestion && (
-                <div className="modal-overlay" onClick={() => !questionAnswered && closeModal()}>
-                    <div
-                        className="modal-content"
-                        onClick={(e) => e.stopPropagation()}
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="modal-question"
-                    >
-                        <h2 id="modal-question">{modalQuestion.question}</h2>
-                        {showStealChooser ? (
-                            <div className="steal-chooser">
-                                <p>Select a player to steal the question:</p>
-                                <div className="steal-chooser-list">
-                                    {eligibleStealers.map(p => (
-                                        <button
-                                            key={p.id}
-                                            className="steal-chooser-button"
-                                            onClick={() => handleManualStealPick(p.id)}
-                                        >
-                                            {p.name || `Player ${p.id}`}
-                                        </button>
-                                    ))}
+                    {showGame && (
+                        <div className="players-scoreboard">
+                            {players.map((p, i) => (
+                                <div
+                                    key={p.id}
+                                    className={`scoreboard-entry ${i === currentPlayerIndex ? 'active-player' : ''}`}
+                                    style={{ borderColor: i === currentPlayerIndex ? '#db2777' : '#fbbf24' }}
+                                >
+                                    <span className="scoreboard-name" style={{ color: getPlayerColor(i) }}>
+                                        {p.name || `Player ${p.id}`}
+                                    </span>
+                                    <span className="scoreboard-points">{p.score} pts</span>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="choices-container">
-                                {modalQuestion.choices.map((choice, idx) => (
-                                    <button
-                                        key={idx}
-                                        className="choice-button"
-                                        onClick={() =>
-                                            stealPhase
-                                                ? handleSteal(choice)
-                                                : handleChoiceClick(choice)
-                                        }
-                                        disabled={questionAnswered}
-                                    >
-                                        {choice.text}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                            ))}
+                        </div>
+                    )}
 
-                        {modalMessage && <p className="modal-message">{modalMessage}</p>}
+                    {uiMessage && <div className="ui-message-banner">{uiMessage}</div>}
 
-                        <div className="modal-buttons">
-                            <button className="modal-btn give-up" onClick={handleGiveUp} disabled={questionAnswered}>
-                                I Give Up
+                    {!players.length ? (
+                        <div className="players-input-box">
+                            <label htmlFor="numPlayers">Number of players: {numPlayers || MIN_PLAYERS}</label>
+                            <input
+                                id="numPlayers"
+                                type="range"
+                                min={MIN_PLAYERS}
+                                max={MAX_PLAYERS}
+                                value={numPlayers || MIN_PLAYERS}
+                                onChange={(e) => setNumPlayers(e.target.value)}
+                            />
+                            <button className="start-btn" onClick={initPlayers}>
+                                Confirm Player Count
                             </button>
                         </div>
-                    </div>
-                </div>
+                    ) : !showGame ? (
+                        <>
+                            <div className="players-row">
+                                {players.map((p, i) => (
+                                    <div
+                                        key={p.id}
+                                        className={`player-box ${i === currentPlayerIndex ? 'active-player' : ''}`}
+                                    >
+                                        <input
+                                            type="text"
+                                            className="player-name-input"
+                                            placeholder={`Player ${p.id} name`}
+                                            value={p.name}
+                                            onChange={(e) => updatePlayerName(i, e.target.value)}
+                                        />
+                                        <div className="player-score">Score: {p.score}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="dashboard-subtext">Please enter a name for each player to begin.</p>
+                            <button className="start-btn" onClick={beginGame} style={{ marginTop: '1rem' }}>
+                                Start Game
+                            </button>
+                        </>
+                    ) : triviaContent && Object.keys(triviaContent).length > 0 ? (
+                        <div className="trivia-grid">
+                            {Object.entries(triviaContent).map(([categoryName, questions]) => (
+                                <div key={categoryName} className="category-column">
+                                    <h3 className="category-name">{categoryName}</h3>
+                                    {[...questions]
+                                        .sort((a, b) => a.points - b.points)
+                                        .map((question, qIdx) => (
+                                            <button
+                                                key={`${categoryName}-${qIdx}`}
+                                                className={`question-button ${answeredQuestions[categoryName]?.has(qIdx) ? 'answered' : ''
+                                                    }`}
+                                                onClick={() => openQuestionModal(categoryName, qIdx)}
+                                                disabled={answeredQuestions[categoryName]?.has(qIdx)}
+                                            >
+                                                {question.points} pts
+                                            </button>
+                                        ))}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p>No trivia categories found.</p>
+                    )}
+
+                    {modalOpen && modalQuestion && (
+                        <div className="modal-overlay" onClick={() => !questionAnswered && closeModal()}>
+                            <div
+                                className="modal-content"
+                                onClick={(e) => e.stopPropagation()}
+                                role="dialog"
+                                aria-modal="true"
+                                aria-labelledby="modal-question"
+                            >
+                                <h2 id="modal-question">{modalQuestion.question}</h2>
+                                {showStealChooser ? (
+                                    <div className="steal-chooser">
+                                        <p>Select a player to steal the question:</p>
+                                        <div className="steal-chooser-list">
+                                            {eligibleStealers.map((p) => (
+                                                <button
+                                                    key={p.id}
+                                                    className="steal-chooser-button"
+                                                    onClick={() => handleManualStealPick(p.id)}
+                                                >
+                                                    {p.name || `Player ${p.id}`}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="choices-container">
+                                        {modalQuestion.choices.map((choice, idx) => (
+                                            <button
+                                                key={idx}
+                                                className="choice-button"
+                                                onClick={() => (stealPhase ? handleSteal(choice) : handleChoiceClick(choice))}
+                                                disabled={questionAnswered}
+                                            >
+                                                {choice.text}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {modalMessage && <p className="modal-message">{modalMessage}</p>}
+
+                                <div className="modal-buttons">
+                                    <button className="modal-btn give-up" onClick={handleGiveUp} disabled={questionAnswered}>
+                                        I Give Up
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
 }
+
+
+
+

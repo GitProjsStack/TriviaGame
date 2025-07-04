@@ -113,6 +113,14 @@
     opacity: 0.85;
 }
 
+.podium-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
 /* Podium spot heights - 1st place tallest */
 .spot-1 {
     height: 260px;

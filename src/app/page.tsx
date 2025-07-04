@@ -8,13 +8,19 @@ import '../app/cssStyling/homepagestyling.css';
 export default function Home() {
   const router = useRouter();
 
+  // Auth input fields
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // Toggle between login and signup
   const [authType, setAuthType] = useState<'signup' | 'login'>('login');
+
+  // UI feedback
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Reset messages when switching between login/signup
   useEffect(() => {
     setError('');
     setSuccessMsg('');
@@ -24,6 +30,7 @@ export default function Home() {
     setError('');
     setSuccessMsg('');
 
+    // Handle signup
     if (authType === 'signup') {
       if (!username.trim()) {
         setError('Please enter a username.');
@@ -49,7 +56,9 @@ export default function Home() {
       if (user) {
         setSuccessMsg('Signup successful! Please check your email to verify your account.');
       }
-    } else {
+    } 
+    // Handle login
+    else {
       const {
         data: { user },
         error: loginError,
@@ -59,6 +68,7 @@ export default function Home() {
         setError(loginError.message);
       } else if (user) {
         setSuccessMsg('Login successful! Redirecting...');
+        // Give user a second to see success before redirect
         setTimeout(() => router.push('./triviaPages/dashboard'), 1500);
       }
     }

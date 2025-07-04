@@ -28,31 +28,41 @@ export default function PlayTriviaPage() {
     const params = useParams() as TriviaParams;
     const id = params.id;
 
+    // Title and trivia content loaded from DB
     const [triviaTitle, setTriviaTitle] = useState<string>('');
     const [triviaContent, setTriviaContent] = useState<TriviaContent | null>(null);
 
+    // Number of players input as string, actual players array
     const [numPlayers, setNumPlayers] = useState('');
     const [players, setPlayers] = useState<TPlayer[]>([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+
+    // Keep track of questions that have been answered (to disable buttons)
     const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, Set<number>>>({});
 
+    // Game and steal phase flags + tracking current stealer
     const [showGame, setShowGame] = useState(false);
     const [stealPhase, setStealPhase] = useState(false);
     const [currentStealerIndex, setCurrentStealerIndex] = useState<number | null>(null);
+
+    // Show manual steal chooser UI and eligible stealers list
     const [showStealChooser, setShowStealChooser] = useState(false);
     const [eligibleStealers, setEligibleStealers] = useState<TPlayer[]>([]);
 
+    // Modal state: open, current question category, question data, index
     const [modalOpen, setModalOpen] = useState(false);
     const [modalCategory, setModalCategory] = useState<string | null>(null);
     const [modalQuestion, setModalQuestion] = useState<TQuestion | null>(null);
     const [modalQuestionIndex, setModalQuestionIndex] = useState<number | null>(null);
 
+    // Messages shown in modal or UI banner
     const [modalMessage, setModalMessage] = useState<string>('');
     const [uiMessage, setUiMessage] = useState<string>('');
 
+    // Flag if question was answered, disables choices to prevent multiple clicks
     const [questionAnswered, setQuestionAnswered] = useState(false);
 
-    // Fetch trivia data on mount
+    // Fetch trivia data on component mount; if error, bounce user back to dashboard
     useEffect(() => {
         if (!id) return;
         (async () => {
@@ -67,11 +77,13 @@ export default function PlayTriviaPage() {
         })();
     }, [id, router]);
 
+    // Shows a temporary banner message on UI
     function showUIMessage(message: string, duration: number = 1000) {
         setUiMessage(message);
         setTimeout(() => setUiMessage(''), duration);
     }
 
+    // Update player name as user types in inputs before game starts
     function updatePlayerName(index: number, newName: string) {
         setPlayers((prev) => {
             const updated = [...prev];
@@ -80,6 +92,7 @@ export default function PlayTriviaPage() {
         });
     }
 
+    // Initialize players array based on number input, default to MIN_PLAYERS
     function initPlayers() {
         const n = Number(numPlayers || MIN_PLAYERS);
         const initialPlayers = Array.from({ length: n }, (_, i) => ({
@@ -91,6 +104,7 @@ export default function PlayTriviaPage() {
         setCurrentPlayerIndex(0);
     }
 
+    // Returns a consistent color for each player index for scoreboard UI
     function getPlayerColor(index: number): string {
         const colors = [
             '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
@@ -100,6 +114,7 @@ export default function PlayTriviaPage() {
         return colors[index % colors.length];
     }
 
+    // Before game starts, make sure every player has a name
     function beginGame() {
         const allNamesValid = players.every(p => p.name.trim().length > 0);
         if (!allNamesValid) {
@@ -109,6 +124,7 @@ export default function PlayTriviaPage() {
         setShowGame(true);
     }
 
+    // Opens modal for selected question, converting raw data to TQuestion format
     function openQuestionModal(categoryName: string, questionIdx: number) {
         if (!triviaContent) return;
         const questions = triviaContent[categoryName];
@@ -127,11 +143,12 @@ export default function PlayTriviaPage() {
         setModalCategory(categoryName);
         setModalQuestion(convertedQuestion);
         setModalQuestionIndex(questionIdx);
-        setModalMessage('');
+        setModalMessage(''); // clear old messages
         setQuestionAnswered(false);
         setModalOpen(true);
     }
 
+    // Mark a question as answered so it gets disabled in UI
     function markQuestionAnswered(categoryName: string, questionIdx: number) {
         setAnsweredQuestions((prev) => {
             const updated = { ...prev };
@@ -141,10 +158,12 @@ export default function PlayTriviaPage() {
         });
     }
 
+    // Move to next player's turn in a simple round-robin way
     function nextPlayer() {
         setCurrentPlayerIndex((prev) => (prev + 1) % players.length);
     }
 
+    // Close the modal and reset modal-related state
     function closeModal() {
         setModalOpen(false);
         setModalQuestion(null);
@@ -153,10 +172,11 @@ export default function PlayTriviaPage() {
         setQuestionAnswered(false);
     }
 
+    // When user gives up, show manual steal chooser instead of auto queue
     function handleGiveUp() {
         if (questionAnswered) return;
 
-        // Show manual steal chooser
+        // Get all other players except current
         const others = players.filter((_, i) => i !== currentPlayerIndex);
         setEligibleStealers(others);
         setShowStealChooser(true);
@@ -164,6 +184,7 @@ export default function PlayTriviaPage() {
         setModalMessage(`Choose a player to attempt stealing.`);
     }
 
+    // Handle steal attempt from the current stealer in steal phase
     function handleSteal(choice: TChoice) {
         if (!stealPhase || currentStealerIndex === null || !modalQuestion) return;
 
@@ -173,6 +194,7 @@ export default function PlayTriviaPage() {
         setModalMessage(result.message);
 
         if (result.isStealSuccess) {
+            // Mark question answered and end steal phase, advance turn properly
             if (modalCategory && modalQuestionIndex !== null) {
                 markQuestionAnswered(modalCategory, modalQuestionIndex);
             }
@@ -183,6 +205,7 @@ export default function PlayTriviaPage() {
                 setCurrentPlayerIndex(result.nextTurnIndex);
             }, 1500);
         } else {
+            // Advance steal queue and continue or end steal phase
             advanceStealTurn();
             if (isStealOver()) {
                 setTimeout(() => {
@@ -201,6 +224,7 @@ export default function PlayTriviaPage() {
         }
     }
 
+    // User picks who tries to steal manually from the list of eligible players
     function handleManualStealPick(playerId: number) {
         const chosenIndex = players.findIndex(p => p.id === playerId);
         if (chosenIndex === -1) return;
@@ -212,6 +236,7 @@ export default function PlayTriviaPage() {
         setQuestionAnswered(false);
     }
 
+    // Handles when player clicks a choice to answer question
     function handleChoiceClick(choice: TChoice) {
         if (questionAnswered) return;
         if (modalQuestionIndex === null || !triviaContent) return;
@@ -220,25 +245,28 @@ export default function PlayTriviaPage() {
             setModalMessage('Correct! Points awarded.');
             setQuestionAnswered(true);
 
+            // Award points to current player
             setPlayers((prev) => {
                 const newPlayers = [...prev];
                 newPlayers[currentPlayerIndex].score += modalQuestion?.points || 0;
                 return newPlayers;
             });
 
+            // Mark question answered so it can't be selected again
             if (modalCategory && modalQuestionIndex !== null) {
                 markQuestionAnswered(modalCategory, modalQuestionIndex);
             }
 
+            // Close modal and pass turn to next player after delay
             setTimeout(() => {
                 closeModal();
                 nextPlayer();
             }, 1500);
         } else {
+            // Incorrect answer: show message and then open manual steal chooser
             setModalMessage('Incorrect. No points awarded.');
             setQuestionAnswered(true);
 
-            // Show manual steal chooser instead of auto steal queue
             const others = players.filter((_, i) => i !== currentPlayerIndex);
             setEligibleStealers(others);
             setShowStealChooser(true);

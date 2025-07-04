@@ -10,17 +10,15 @@ import {
 import { Question, TriviaGame } from '../../../interfaces/triviaTypes';
 import '../../../cssStyling/editTriviastyling.css';
 
-const MAX_POINTS_PER_QUESTION = 10000; // Maximum points allowed per question
-const MIN_POINTS_PER_QUESTION = 1; // Minimum points required per question
-
-const MAX_CHOICES = 6; // Maximum choices allowed per question
-const MIN_CHOICES = 2; // Minimum choices required per question
-
-const MAX_QUESTIONS_PER_CATEGORY = 10; // Maximum questions allowed per category
-const MIN_QUESTIONS_PER_CATEGORY = 1; // Minimum questions required per category
-
-const MAX_CATEGORIES = 10; // Maximum categories allowed in a trivia
-const MIN_CATEGORIES = 1; // Minimum categories required in a trivia
+// Trivia editing constants — keeps trivia creation structured and prevents abuse
+const MAX_POINTS_PER_QUESTION = 10000;
+const MIN_POINTS_PER_QUESTION = 1;
+const MAX_CHOICES = 6;
+const MIN_CHOICES = 2;
+const MAX_QUESTIONS_PER_CATEGORY = 10;
+const MIN_QUESTIONS_PER_CATEGORY = 1;
+const MAX_CATEGORIES = 10;
+const MIN_CATEGORIES = 1;
 
 const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
@@ -38,13 +36,12 @@ export default function EditTrivia() {
     const [targetCategory, setTargetCategory] = useState<string | null>(null);
 
     const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-
     const [newCategoryName, setNewCategoryName] = useState('');
     const [categoryError, setCategoryError] = useState<string | null>(null);
+
     const [newQuestionText, setNewQuestionText] = useState('');
     const [newChoices, setNewChoices] = useState([generateChoice(), generateChoice()]);
     const [newPoints, setNewPoints] = useState<number | null>(null);
-
     const [pointsError, setPointsError] = useState<string | null>(null);
 
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
@@ -52,9 +49,9 @@ export default function EditTrivia() {
 
     const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
     const [submitMessage, setSubmitMessage] = useState<string | null>(null);
-
     const [confirmSubmitOpen, setConfirmSubmitOpen] = useState(false);
 
+    // Load the trivia data on mount
     useEffect(() => {
         if (!id) return;
         setLoading(true);
@@ -106,7 +103,6 @@ export default function EditTrivia() {
         });
 
         const correctIndex = filledChoices.findIndex((c) => c.id === selectedAnswerId);
-        
         if (newPoints === null || isNaN(newPoints) || newPoints <= 0)
             return setFormError('Please enter a valid number of points.');
 
@@ -230,6 +226,7 @@ export default function EditTrivia() {
             </div>
         );
     }
+
     if (error || !trivia) return <p>Error: {error || 'Not found'}</p>;
 
     return (
@@ -478,7 +475,6 @@ export default function EditTrivia() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

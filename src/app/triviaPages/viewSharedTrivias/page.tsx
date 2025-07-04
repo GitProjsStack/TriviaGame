@@ -25,16 +25,18 @@ export default function ViewSharedTrivias() {
       return;
     }
     const data = await getSharedTriviasWithSharerInfo(user.id);
-    // For each profile pic, get signed URL if exists
+
+    // Get signed profile picture URLs (if user uploaded one)
     const updatedData = await Promise.all(
       data.map(async (trivia) => {
         if (trivia.sharerProfilePicUrl) {
-          const signedUrl = await generateUSERProfilePicSignedUrl(trivia.sharerProfilePicUrl, 60 * 60); // 1 hour
+          const signedUrl = await generateUSERProfilePicSignedUrl(trivia.sharerProfilePicUrl, 60 * 60); // 1 hour expiry
           return { ...trivia, sharerProfilePicUrl: signedUrl };
         }
         return trivia;
       })
     );
+
     setSharedTrivias(updatedData);
     setLoading(false);
   };
@@ -46,6 +48,7 @@ export default function ViewSharedTrivias() {
   const handleDelete = async (triviaId: string) => {
     const user = await getAuthenticatedUser();
     if (!user) return;
+
     const success = await removeTriviaFromSharedWithMe(user.id, triviaId);
     if (success) {
       setSharedTrivias((prev) => prev.filter((t) => t.triviaId !== triviaId));
@@ -97,10 +100,10 @@ export default function ViewSharedTrivias() {
                 <button
                   className="rounded-btn play"
                   onClick={() => {
-                    setPlayLoadingId(triviaId); // show spinner for this card
+                    setPlayLoadingId(triviaId);
                     setTimeout(() => {
                       router.push(`./playTrivia/${triviaId}`);
-                    }, 2000); // 2 second delay
+                    }, 2000); // Delay is mostly for fun UX / spinner effect
                   }}
                 >
                   {playLoadingId === triviaId ? <div className="mini-spinner" /> : '▶ Play'}

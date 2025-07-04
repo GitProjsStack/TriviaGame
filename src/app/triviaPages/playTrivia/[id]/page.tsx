@@ -167,6 +167,7 @@ export default function PlayTriviaPage() {
 
     // Mark a question as answered so it gets disabled in UI
     function markQuestionAnswered(categoryName: string, questionIdx: number) {
+        console.log('[markQuestionAnswered]', categoryName, questionIdx);
         setAnsweredQuestions((prev) => {
             const updated = { ...prev };
             if (!updated[categoryName]) updated[categoryName] = new Set();
@@ -204,6 +205,9 @@ export default function PlayTriviaPage() {
     // Handle steal attempt from the current stealer in steal phase
     function handleSteal(choice: TChoice) {
         if (!stealPhase || currentStealerIndex === null || !modalQuestion) return;
+
+        console.log('[handleSteal] currentStealerIndex:', currentStealerIndex, 'isCorrect:', choice.isCorrect);
+        console.log('[handleSteal] before update, players:', players.map(p => ({ name: p.name, score: p.score })));
 
         const result = evaluateStealAnswer(players, modalQuestion.points, currentStealerIndex, choice.isCorrect);
 
@@ -255,6 +259,9 @@ export default function PlayTriviaPage() {
 
     // Handles when player clicks a choice to answer question
     function handleChoiceClick(choice: TChoice) {
+
+        console.log('[handleChoiceClick] called', { questionAnswered, currentPlayerIndex, points: modalQuestion?.points });
+
         if (questionAnswered) return;
         if (modalQuestionIndex === null || !triviaContent) return;
 
@@ -262,12 +269,8 @@ export default function PlayTriviaPage() {
             setModalMessage('Correct! Points awarded.');
             setQuestionAnswered(true);
 
-            // Award points to current player
-            setPlayers((prev) => {
-                const newPlayers = [...prev];
-                newPlayers[currentPlayerIndex].score += modalQuestion?.points || 0;
-                return newPlayers;
-            });
+            players[currentPlayerIndex].score += modalQuestion?.points || 0;
+            setPlayers(players);
 
             // Mark question answered so it can't be selected again
             if (modalCategory && modalQuestionIndex !== null) {

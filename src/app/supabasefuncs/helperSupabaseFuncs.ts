@@ -49,13 +49,6 @@ export async function fetchMatchingUsersBySimilarName(
     return [];
   }
 
-  if (!data || data.length === 0) {
-    console.warn('⚠️ No users found matching:', name);
-    return [];
-  }
-
-  console.log(`✅ Found ${data.length} user(s) matching "${name}":`, data);
-
   return data.map(toShareRecipient);
 }
 
@@ -142,6 +135,7 @@ export async function getAllTriviaSharedWithUser(user: ShareRecipient): Promise<
 }
 
 export async function updateTriviaSharedWithUser(userId: string, updated: string[]): Promise<boolean> {
+
   const { error } = await supabase
     .from(CLIENTS_TABLE)
     .update({ [COL_SHARED_TRIVIA]: updated })

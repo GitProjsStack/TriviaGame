@@ -16,6 +16,31 @@ export interface TriviaGame {
     content: TriviaContent;
 }
 
+export interface TChoice {
+  text: string;
+  isCorrect: boolean;
+}
+
+export interface TQuestion {
+  question: string;
+  points: number;
+  choices: TChoice[];
+}
+
+export interface TCategory {
+  name: string;
+  questions: TQuestion[];
+}
+
+export interface TContent {
+  categories: TCategory[];
+}
+
+export interface TPlayer {
+  id: number;
+  score: number;
+}
+
 export type ShareRecipient = {
     id: string;
     username: string;

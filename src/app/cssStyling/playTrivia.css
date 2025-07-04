@@ -1,23 +1,3 @@
-.play-container {
-  max-width: 900px;
-  margin: 1rem auto 3rem;
-  padding: 1rem 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #222;
-}
-
-.play-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.trivia-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #db2777;
-}
-
 .players-row {
   display: flex;
   justify-content: center;
@@ -33,7 +13,7 @@
   padding: 0.6rem 1rem;
   width: 140px;
   box-shadow: 0 4px 8px rgb(253 224 71 / 0.4);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   user-select: none;
   display: flex;
   flex-direction: column;
@@ -63,16 +43,11 @@
   background-color: #fff0f6;
 }
 
-.player-score {
-  font-weight: 600;
-  color: #b45309;
-}
-
 .players-input-box {
   display: flex;
-  flex-direction: column; 
-  align-items: center; 
-  gap: 0.75rem; 
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   margin: 2rem 0;
 }
 
@@ -81,13 +56,22 @@
   margin-right: 0.5rem;
 }
 
-.players-input-box input[type='number'] {
-  width: 60px;
-  padding: 0.3rem 0.4rem;
+.player-name {
+  font-weight: 700;
+  color: #b45309;
   font-size: 1.1rem;
-  border: 1.5px solid #f59e0b;
-  border-radius: 6px;
-  margin-right: 1rem;
+  margin-bottom: 0.3rem;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-score {
+  font-weight: 600;
+  color: #b45309;
+  width: 100%;
   text-align: center;
 }
 
@@ -109,11 +93,18 @@
 }
 
 .trivia-grid {
-  display: flex;
-  justify-content: center;
-  gap: 1.2rem;
-  flex-wrap: wrap;
+  display: grid !important;
+  gap: 10px;
   margin-top: 2rem;
+  grid-auto-rows: min-content;
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .trivia-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+  }
 }
 
 .category-column {
@@ -124,6 +115,9 @@
   min-width: 180px;
   max-width: 220px;
   box-shadow: 0 6px 14px rgb(252 211 77 / 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .category-name {
@@ -151,8 +145,6 @@
 .question-button:hover {
   background-color: #fde68a;
 }
-
-/* Modal */
 
 .modal-overlay {
   position: fixed;
@@ -213,7 +205,7 @@
 .modal-message {
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #16a34a; /* green for positive, override in JS if needed */
+  color: #16a34a;
   text-align: center;
 }
 
@@ -255,37 +247,54 @@
   cursor: not-allowed;
 }
 
-.play-header {
+.ui-message-banner {
+  color: #b91c1c;
+  font-weight: 700;
   text-align: center;
-  margin-bottom: 1.5rem;
-  position: relative; /* to help position the button if needed */
-}
-
-.quit-btn {
-  margin: 0 auto 1.5rem;
-  padding: 0.75rem 2rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #f97316;             /* orange same as dashboard headings */
-  background-color: #fff7ed;  /* soft warm off-white */
-  border: 3px solid #fcd34d;  /* golden border */
-  border-radius: 24px;
-  box-shadow: 0 8px 25px rgba(252, 211, 77, 0.25);
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-  display: inline-block;
-  text-align: center;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  border-bottom: 2px solid #f87171;
+  font-size: 1.1rem;
   user-select: none;
 }
 
-.quit-btn:hover {
-  background-color: #fef3c7;  /* slightly lighter */
+.players-scoreboard {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.scoreboard-entry {
+  background: #fff7ed;
+  border: 2px solid #fbbf24;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+  transition: all 0.3s ease;
+}
+
+.scoreboard-entry.active-player {
+  border-color: #db2777;
+  box-shadow: 0 0 8px 3px rgba(219, 39, 119, 0.8);
   transform: scale(1.05);
-  box-shadow: 0 12px 32px rgba(253, 224, 71, 0.35);
 }
 
-.quit-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 6px 18px rgba(253, 224, 71, 0.25);
+.scoreboard-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.scoreboard-points {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #78350f;
+}

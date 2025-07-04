@@ -21,7 +21,7 @@
 
 .dashboard-back-button {
   display: block;
-  margin: 0 auto 2rem auto;
+  margin: 0 auto;
   background-color: #eaeaea;
   border: none;
   padding: 0.5rem 1.2rem;
@@ -183,4 +183,11 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }

@@ -32,10 +32,6 @@ export interface TCategory {
   questions: TQuestion[];
 }
 
-export interface TContent {
-  categories: TCategory[];
-}
-
 export interface TPlayer {
   id: number;
   score: number;

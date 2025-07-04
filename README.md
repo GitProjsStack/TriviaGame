@@ -257,9 +257,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 
 - Finally, install dependencies and start the dev server in the project root:
 ```bash
-# After you executed this:
-# git clone https://github.com/GitProjsStack/TriviaShare.git
-# cd TriviaShare
+# Assuming you've already cloned the repo and entered the project directory
 npm install
 npm run dev
 ```

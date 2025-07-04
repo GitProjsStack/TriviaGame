@@ -115,7 +115,6 @@
 }
 
 /* Left side label styling */
-.modal-label>span,
 .choice-label>span {
     flex: 0 0 100px;
     /* fixed width for alignment */
@@ -225,10 +224,17 @@
 
 /* Modal footer buttons container */
 .modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
-    margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+@media (max-width: 480px) {
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
 }
 
 /* Cancel and Save buttons */
@@ -434,14 +440,38 @@
     text-align: center;
 }
 
-.modal-box.category-modal .modal-label {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+.modal-box.category-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.modal-box.category-modal .modal-label>span {
+.modal-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-label > span {
+  width: 100px;
+  font-weight: bold;
+  color: #7c2d12;
+  flex-shrink: 0;
+}
+
+.modal-label > textarea,
+.modal-label > input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #ffae42;
+  border-radius: 14px;
+  background-color: #fff8e1;
+  box-shadow: inset 0 2px 5px rgba(255, 174, 66, 0.3);
+}
+
+.modal-box.category-modal {
     font-size: 1.15rem;
     font-weight: 600;
     color: #8b3200;
@@ -554,17 +584,72 @@
   }
 }
 
-.points-input {
-  margin-top: 8px;
-  padding: 6px 10px;
+/* --- Label Row Layout --- */
+.modal-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-label > span {
   width: 100px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+  font-weight: bold;
+  color: #7c2d12;
+  flex-shrink: 0;
+}
+
+.modal-label > textarea,
+.modal-label > input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #ffae42;
+  border-radius: 14px;
+  background-color: #fff8e1;
+  box-shadow: inset 0 2px 5px rgba(255, 174, 66, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: border-color 0.3s ease;
+  margin-left: 1rem;
+}
+
+/* --- Points Input Specific --- */
+.points-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.points-label > span {
+  margin-right: 0.5rem; /* Space between "Points:" and input */
+  font-weight: bold;
+  color: #7c2d12;
+  flex-shrink: 0;
+}
+
+.points-input {
+  width: 80px; /* Fixed width for points input */
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #ffae42;
+  border-radius: 14px;
+  background-color: #fff8e1;
+  box-shadow: inset 0 2px 5px rgba(255, 174, 66, 0.3);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: border-color 0.3s ease;
 }
 
 .points-tag {
   font-size: 12px;
   color: #666;
   margin-left: 8px;
+}
+
+.points-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.points-input-wrapper .points-input {
+  width: 50px;
 }

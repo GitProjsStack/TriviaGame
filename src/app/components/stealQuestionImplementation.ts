@@ -8,26 +8,6 @@ let stealIndex = 0;
 let originalTurnIndex = 0;
 
 /**
- * Initialize the steal queue for current turn.
- * The steal queue is all players after the current player in turn order,
- * wrapping around until all other players are included.
- * 
- * @param currentIndex - index of the player who missed
- * @param playerCount - total number of players
- */
-export function initStealQueue(currentIndex: number, playerCount: number) {
-  originalTurnIndex = currentIndex;
-  stealQueue = [];
-
-  // Fill queue with all other players in order, skipping current player
-  for (let i = 1; i < playerCount; i++) {
-    stealQueue.push((currentIndex + i) % playerCount);
-  }
-
-  stealIndex = 0;
-}
-
-/**
  * Get the player index of who is currently allowed to steal.
  */
 export function getCurrentStealer() {

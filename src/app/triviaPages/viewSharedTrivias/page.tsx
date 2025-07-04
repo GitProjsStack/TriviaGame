@@ -65,7 +65,9 @@ export default function ViewSharedTrivias() {
       </button>
 
       {loading ? (
-        <p>Loading shared trivias...</p>
+        <div className="spinner-container">
+          <div className="spinner" />
+        </div>
       ) : sharedTrivias.length === 0 ? (
         <p>No trivia games shared with you yet.</p>
       ) : (

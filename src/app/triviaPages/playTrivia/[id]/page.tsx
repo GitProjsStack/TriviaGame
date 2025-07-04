@@ -3,6 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { getTriviaById } from '@/app/supabasefuncs/helperSupabaseFuncs';
+import { 
+    MIN_PLAYERS,
+    MAX_PLAYERS,
+    BUTTON_LABELS,
+    EDIT_TRIVIA_LIMITS
+ } from '@/app/constants/gameSettings';
 import {
     TPlayer,
     TQuestion,
@@ -20,8 +26,7 @@ import TriviaEndScreen from '../../triviaEndScreen/page';
 import '../../../cssStyling/viewSharedTrivias.css';
 import '../../../cssStyling/playTrivia.css';
 
-const MIN_PLAYERS = 2;
-const MAX_PLAYERS = 10;
+const COLORS = EDIT_TRIVIA_LIMITS.COLORS;
 
 export default function PlayTriviaPage() {
     const router = useRouter();
@@ -123,12 +128,7 @@ export default function PlayTriviaPage() {
 
     // Returns a consistent color for each player index for scoreboard UI
     function getPlayerColor(index: number): string {
-        const colors = [
-            '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
-            '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
-            '#B2FF59', '#FFD740', '#FFAB40', '#FF6E40'
-        ];
-        return colors[index % colors.length];
+        return COLORS[index % COLORS.length];
     }
 
     // Before game starts, make sure every player has a name
@@ -303,7 +303,7 @@ export default function PlayTriviaPage() {
                             className="dashboard-back-button"
                             onClick={() => router.push('../dashboard')}
                         >
-                            ← Back to Dashboard
+                            {BUTTON_LABELS.BACK_TO_DASHBOARD}
                         </button>
                         <button
                             className="dashboard-back-button"
@@ -440,7 +440,7 @@ export default function PlayTriviaPage() {
 
                                 <div className="modal-buttons">
                                     <button className="modal-btn give-up" onClick={handleGiveUp} disabled={questionAnswered}>
-                                        I Give Up
+                                        {BUTTON_LABELS.GIVE_UP}
                                     </button>
                                 </div>
                             </div>

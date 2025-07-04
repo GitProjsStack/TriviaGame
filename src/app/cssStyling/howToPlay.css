@@ -1,0 +1,72 @@
+.how-to-play-container {
+  max-width: 720px;
+  margin: 3rem auto;
+  padding: 1.5rem 2rem;
+  background: #1e1e2f;
+  color: #e0e0f0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(100, 100, 150, 0.3);
+}
+
+.page-title {
+  text-align: center;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #f472b6;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 8px #f472b6;
+}
+
+.section {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #44475a;
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  color: #fbbf24;
+  margin-bottom: 0.8rem;
+  text-shadow: 0 0 5px #fbbf24;
+}
+
+.section p,
+.section ul,
+.section ol {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.section ul,
+.section ol {
+  margin-left: 1.3rem;
+  margin-top: 0.5rem;
+}
+
+.section ul li,
+.section ol li {
+  margin-bottom: 0.5rem;
+}
+
+.back-button {
+  display: block;
+  margin: 0 auto;
+  background: #f472b6;
+  color: #1e1e2f;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(244, 114, 182, 0.5);
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background: #db2777;
+  color: white;
+  box-shadow: 0 6px 16px rgba(219, 39, 119, 0.7);
+}

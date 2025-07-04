@@ -13,14 +13,14 @@ import '../cssStyling/ProfilePicture.css';
 type Props = {
   src?: string | null;
   alt?: string;
-  clickable?: boolean; // If true, clicking will trigger upload
+  clickable?: boolean; // if true, clicking the picture triggers file upload dialog
 };
 
-// Sanitize filename: replace spaces with underscores and remove unsafe chars
+// Clean up filenames for storage — replace spaces, remove unsafe chars
 function sanitizeFilename(filename: string): string {
   return filename
-    .replace(/\s+/g, '_')       // replace spaces with underscores
-    .replace(/[^\w.-]/g, '');   // remove characters other than letters, numbers, underscore, dot, dash
+    .replace(/\s+/g, '_')       // spaces to underscores
+    .replace(/[^\w.-]/g, '');   // strip out anything except letters, numbers, underscore, dot, dash
 }
 
 export default function ProfilePicture({ src, alt = 'User profile picture', clickable = false }: Props) {
@@ -31,8 +31,10 @@ export default function ProfilePicture({ src, alt = 'User profile picture', clic
   const [currentProfilePicPath, setCurrentProfilePicPath] = useState<string | null>(null);
 
   useEffect(() => {
-    if (src !== undefined) return; // Don't run if using passed-in src (display-only mode)
+    // If src is passed from parent, just display it, no need to fetch anything
+    if (src !== undefined) return;
 
+    // Fetch user info and load signed URL for their profile pic
     async function fetchPic() {
       const user = await getAuthenticatedUser();
       if (!user) return;
@@ -55,17 +57,22 @@ export default function ProfilePicture({ src, alt = 'User profile picture', clic
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setErrorMsg(null);
+
     const file = e.target.files?.[0];
     if (!file || !userId) return;
 
+    // Simple size check: max 1MB
     if (file.size > 1048576) {
       setErrorMsg('File too large. Max 1MB allowed.');
       return;
     }
 
+    // Prepare safe filename for upload
     const safeFileName = sanitizeFilename(file.name);
+    // Use userId and timestamp to avoid collisions
     const newPath = `${userId}/${Date.now()}-${safeFileName}`;
 
+    // Upload file, replacing old one if exists
     const success = await uploadToUSERProfilePics(userId, newPath, file, currentProfilePicPath || undefined);
 
     if (!success) {
@@ -73,6 +80,7 @@ export default function ProfilePicture({ src, alt = 'User profile picture', clic
       return;
     }
 
+    // After upload, generate signed URL to display new pic
     const signedUrl = await generateUSERProfilePicSignedUrl(newPath);
     if (signedUrl) {
       setImageUrl(signedUrl);
@@ -80,6 +88,7 @@ export default function ProfilePicture({ src, alt = 'User profile picture', clic
     }
   };
 
+  // Final image src: either from props or fetched URL
   const finalSrc = src ?? imageUrl;
 
   return (
@@ -91,10 +100,12 @@ export default function ProfilePicture({ src, alt = 'User profile picture', clic
         {finalSrc ? (
           <img src={finalSrc} alt={alt} className="profile-pic-image" />
         ) : (
+          // fallback icon when no pic available
           <div className="profile-placeholder">👤</div>
         )}
       </div>
 
+      {/* Hidden file input triggered by clicking picture */}
       {clickable && (
         <input
           type="file"
@@ -105,6 +116,7 @@ export default function ProfilePicture({ src, alt = 'User profile picture', clic
         />
       )}
 
+      {/* Show error messages below picture */}
       {errorMsg && (
         <p style={{ color: 'red', marginTop: '0.5rem', fontWeight: '600' }}>{errorMsg}</p>
       )}

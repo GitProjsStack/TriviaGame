@@ -24,6 +24,7 @@ export default function CreateEditTrivias() {
   const [creating, setCreating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Load trivia games created by the logged-in user on page mount
   useEffect(() => {
     const fetchTriviaGames = async () => {
       const user = await getAuthenticatedUser();
@@ -37,13 +38,14 @@ export default function CreateEditTrivias() {
     fetchTriviaGames();
   }, []);
 
-  // Handle Create New Trivia submit
+  // Handle logic for creating a new trivia
   const handleCreateTrivia = async () => {
     setErrorMsg('');
     if (!newTitle.trim()) {
       setErrorMsg('Please enter a title.');
       return;
     }
+
     setCreating(true);
 
     const user = await getAuthenticatedUser();
@@ -53,6 +55,7 @@ export default function CreateEditTrivias() {
       return;
     }
 
+    // Create a blank trivia game with default "in progress" status
     const created = await createTriviaGame({
       creator_id: user.id,
       title: newTitle.trim(),
@@ -66,6 +69,7 @@ export default function CreateEditTrivias() {
       return;
     }
 
+    // Add the new trivia ID to the user's `clients` record
     const updated = await addTriviaIdToClient(user.id, created.triviaId!);
     if (!updated.success) {
       setErrorMsg('Failed to update client trivia list: ' + updated.error);
@@ -73,14 +77,17 @@ export default function CreateEditTrivias() {
       return;
     }
 
+    // Refresh trivia list after creation
     const games = await getMyTriviaGames(user.id);
     setTriviaGames(games);
 
+    // Reset modal/input states
     setNewTitle('');
     setShowModal(false);
     setCreating(false);
   };
 
+  // Handle logic for deleting a trivia game
   const handleDeleteTrivia = async (id: string) => {
     setDeleteErrorMsg('');
     setDeletingId(id);
@@ -100,7 +107,7 @@ export default function CreateEditTrivias() {
       return;
     }
 
-    // Refresh list after delete
+    // Reload trivia list after successful delete
     const games = await getMyTriviaGames(user.id);
     setTriviaGames(games);
     setDeletingId(null);

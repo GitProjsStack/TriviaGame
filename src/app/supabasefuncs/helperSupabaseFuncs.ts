@@ -1,6 +1,7 @@
 import { supabase } from '../supabase/supabaseClient';
 import { ShareRecipient } from '../interfaces/triviaTypes';
 
+// Constants for table and column names
 export const CLIENTS_TABLE = 'clients';
 export const COL_MY_TRIVIA = 'my_trivia_games';
 export const COL_SHARED_TRIVIA = 'trivia_games_shared_w_me';
@@ -18,6 +19,7 @@ export const COL_TRIVIA_CREATED_AT = 'created_at';
 const SELECT_CLIENT_FIELDS = [COL_CREATOR_ID, COL_USERNAME, COL_PROFILE_PIC].join(', ');
 const AVATAR_BUCKET = 'avatars';
 
+// Helper to format a Supabase user row into our ShareRecipient type
 function toShareRecipient(user: any): ShareRecipient {
   return {
     id: user[COL_CREATOR_ID],
@@ -26,6 +28,7 @@ function toShareRecipient(user: any): ShareRecipient {
   };
 }
 
+// Returns the currently logged-in user or null if not authenticated
 export async function getAuthenticatedUser() {
   const {
     data: { user },
@@ -35,10 +38,8 @@ export async function getAuthenticatedUser() {
   return user;
 }
 
-export async function fetchMatchingUsersBySimilarName(
-  name: string
-): Promise<ShareRecipient[]> {
-
+// Used to search for users to share trivia with
+export async function fetchMatchingUsersBySimilarName(name: string): Promise<ShareRecipient[]> {
   const { data, error } = await supabase
     .from(CLIENTS_TABLE)
     .select(SELECT_CLIENT_FIELDS)
@@ -52,6 +53,7 @@ export async function fetchMatchingUsersBySimilarName(
   return data.map(toShareRecipient);
 }
 
+// Signs the user out and optionally performs a callback afterward
 export async function handleSignOut(afterSignOut?: () => void): Promise<void> {
   const { error } = await supabase.auth.signOut();
   if (error) {
@@ -61,6 +63,7 @@ export async function handleSignOut(afterSignOut?: () => void): Promise<void> {
   if (afterSignOut) afterSignOut();
 }
 
+// Retrieves full client profile by ID
 export async function getUSERProfile(userId: string) {
   const { data, error } = await supabase
     .from(CLIENTS_TABLE)
@@ -76,13 +79,14 @@ export async function getUSERProfile(userId: string) {
   return data;
 }
 
+// Uploads new profile picture to Supabase Storage + updates DB
 export async function uploadToUSERProfilePics(
   userID: string,
   filePath: string,
   file: File,
   oldFilePath?: string
 ): Promise<boolean> {
-  // 1. Delete old profile pic if it exists
+  // Delete the old profile picture if it exists
   if (oldFilePath) {
     const { error: deleteError } = await supabase.storage
       .from(AVATAR_BUCKET)
@@ -90,12 +94,10 @@ export async function uploadToUSERProfilePics(
 
     if (deleteError) {
       console.error('Error deleting old user profile pic:', deleteError);
-      // You can choose to return false or just log and continue
-      // return false;
     }
   }
 
-  // 2. Upload new profile pic
+  // Upload new profile pic
   const { error: uploadError } = await supabase.storage
     .from(AVATAR_BUCKET)
     .upload(filePath, file, {
@@ -108,7 +110,7 @@ export async function uploadToUSERProfilePics(
     return false;
   }
 
-  // 3. Update DB with new file path
+  // Update database with new image path
   const { error: updateError } = await supabase
     .from(CLIENTS_TABLE)
     .update({ profile_pic_url: filePath })
@@ -122,6 +124,7 @@ export async function uploadToUSERProfilePics(
   return true;
 }
 
+// Returns a list of trivia IDs that were shared with the given user
 export async function getAllTriviaSharedWithUser(user: ShareRecipient): Promise<string[] | null> {
   const { data, error } = await supabase
     .from(CLIENTS_TABLE)
@@ -134,8 +137,8 @@ export async function getAllTriviaSharedWithUser(user: ShareRecipient): Promise<
   return data[COL_SHARED_TRIVIA] || [];
 }
 
+// Overwrites shared trivia list for a given user
 export async function updateTriviaSharedWithUser(userId: string, updated: string[]): Promise<boolean> {
-
   const { error } = await supabase
     .from(CLIENTS_TABLE)
     .update({ [COL_SHARED_TRIVIA]: updated })
@@ -144,8 +147,8 @@ export async function updateTriviaSharedWithUser(userId: string, updated: string
   return !error;
 }
 
+// Gets a signed URL for temporary access to profile pic
 export async function generateUSERProfilePicSignedUrl(filePath: string, expiresInSeconds = 60): Promise<string | null> {
-
   const { data, error } = await supabase
     .storage
     .from(AVATAR_BUCKET)
@@ -159,7 +162,7 @@ export async function generateUSERProfilePicSignedUrl(filePath: string, expiresI
   return data.signedUrl;
 }
 
-
+// Gets the full trivia objects for games created by the user
 export async function getMyTriviaGames(userId: string) {
   const { data: clientData, error: clientError } = await supabase
     .from(CLIENTS_TABLE)
@@ -183,6 +186,7 @@ export async function getMyTriviaGames(userId: string) {
   return triviaData;
 }
 
+// Creates a new trivia game row
 export async function createTriviaGame(trivia: {
   creator_id: string;
   title: string;
@@ -199,6 +203,7 @@ export async function createTriviaGame(trivia: {
   return { success: true, triviaId: data.id, createdAt: data.created_at };
 }
 
+// Adds a trivia ID to the user's personal trivia list
 export async function addTriviaIdToClient(
   userId: string,
   triviaId: string
@@ -225,6 +230,7 @@ export async function addTriviaIdToClient(
   return { success: true };
 }
 
+// Gets full trivia row by ID
 export async function getTriviaById(id: string) {
   const { data, error } = await supabase
     .from(TRIVIA_TABLE)
@@ -236,6 +242,7 @@ export async function getTriviaById(id: string) {
   return { trivia: data, error: null };
 }
 
+// Replaces the content field of a trivia
 export async function updateTriviaContent(triviaId: string, content: any) {
   const { data, error } = await supabase
     .from(TRIVIA_TABLE)
@@ -248,6 +255,7 @@ export async function updateTriviaContent(triviaId: string, content: any) {
   return data;
 }
 
+// Updates the status (e.g., 'completed') for a trivia game
 export async function updateTriviaStatus(triviaId: string, status: string) {
   const { data, error } = await supabase
     .from(TRIVIA_TABLE)
@@ -258,8 +266,9 @@ export async function updateTriviaStatus(triviaId: string, status: string) {
   return data;
 }
 
+// Deletes a trivia game and removes all references from users
 export async function deleteTriviaById(triviaId: string): Promise<{ success: boolean; error?: string }> {
-  // Step 1: Delete the trivia from triviagames table
+  // Delete from triviagames table
   const { error: deleteError } = await supabase
     .from(TRIVIA_TABLE)
     .delete()
@@ -267,17 +276,13 @@ export async function deleteTriviaById(triviaId: string): Promise<{ success: boo
 
   if (deleteError) return { success: false, error: deleteError.message };
 
-  // Step 2: Fetch all clients
+  // Now clean up all client references to that trivia
   const { data: clients, error: clientsError } = await supabase
     .from(CLIENTS_TABLE)
     .select(`${COL_CREATOR_ID}, ${COL_MY_TRIVIA}, ${COL_SHARED_TRIVIA}`);
 
-  if (clientsError || !clients) {
-    console.error('Failed to fetch clients for cleanup');
-    return { success: true }; // trivia was deleted, so we still return success
-  }
+  if (clientsError || !clients) return { success: true };
 
-  // Step 3: For each client, clean up the references
   for (const client of clients) {
     const updates: Record<string, any> = {};
 
@@ -310,7 +315,7 @@ export async function deleteTriviaById(triviaId: string): Promise<{ success: boo
   return { success: true };
 }
 
-// Fetch current user's shared trivia IDs, and then fetch all trivia info plus sharer info for each
+// Gets all trivia shared with the user, including the sharer's name and profile
 export async function getSharedTriviasWithSharerInfo(userId: string): Promise<
   Array<{
     triviaId: string;
@@ -320,7 +325,6 @@ export async function getSharedTriviasWithSharerInfo(userId: string): Promise<
     sharerProfilePicUrl: string | null;
   }>
 > {
-  // 1. Get trivia IDs shared with user
   const { data: clientData, error: clientError } = await supabase
     .from(CLIENTS_TABLE)
     .select(COL_SHARED_TRIVIA)
@@ -332,7 +336,6 @@ export async function getSharedTriviasWithSharerInfo(userId: string): Promise<
   const sharedTriviaIds: string[] = clientData[COL_SHARED_TRIVIA];
   if (!sharedTriviaIds || sharedTriviaIds.length === 0) return [];
 
-  // 2. Fetch trivia details for those IDs
   const { data: triviaData, error: triviaError } = await supabase
     .from(TRIVIA_TABLE)
     .select(`${COL_TRIVIA_ID}, ${COL_TRIVIA_TITLE}, ${COL_CREATOR_ID}`)
@@ -340,8 +343,6 @@ export async function getSharedTriviasWithSharerInfo(userId: string): Promise<
 
   if (triviaError || !triviaData) return [];
 
-  // 3. Fetch creator info (username and profile pic) for all trivia creators
-  // Extract unique creator IDs
   const uniqueCreatorIds = Array.from(new Set(triviaData.map(t => t.creator_id)));
 
   const { data: creatorsData, error: creatorsError } = await supabase
@@ -351,12 +352,10 @@ export async function getSharedTriviasWithSharerInfo(userId: string): Promise<
 
   if (creatorsError || !creatorsData) return [];
 
-  // Map creatorId to user info
   const creatorMap = new Map(
     creatorsData.map(c => [c[COL_CREATOR_ID], { username: c[COL_USERNAME], profile_pic_url: c[COL_PROFILE_PIC] }])
   );
 
-  // 4. Build result list with trivia and sharer info
   return triviaData.map(t => ({
     triviaId: t[COL_TRIVIA_ID],
     title: t[COL_TRIVIA_TITLE],
@@ -366,7 +365,7 @@ export async function getSharedTriviasWithSharerInfo(userId: string): Promise<
   }));
 }
 
-// Remove a trivia ID from the current user's trivia_games_shared_w_me list
+// Removes a trivia ID from the user's shared list
 export async function removeTriviaFromSharedWithMe(userId: string, triviaIdToRemove: string): Promise<boolean> {
   const { data: clientData, error: clientError } = await supabase
     .from(CLIENTS_TABLE)

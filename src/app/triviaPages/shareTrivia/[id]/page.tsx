@@ -26,7 +26,7 @@ export default function ShareTriviaPage() {
     const [isSearching, setIsSearching] = useState(false);
     const [shareStatus, setShareStatus] = useState<string | null>(null);
 
-    // Load trivia title for display
+    // Load trivia title when page opens (we need it for display + user feedback)
     useEffect(() => {
         if (!triviaid) return;
 
@@ -38,10 +38,11 @@ export default function ShareTriviaPage() {
                 setTriviaTitle('Unknown Trivia');
             }
         }
+
         fetchTitle();
     }, [triviaid]);
 
-    // Search users by username prefix
+    // Live search — triggers on every keystroke in the search bar
     useEffect(() => {
         if (query.trim() === '') {
             setResults([]);
@@ -50,7 +51,7 @@ export default function ShareTriviaPage() {
         fetchMatchingUsers(query);
     }, [query]);
 
-    // Clear share status after 3 seconds
+    // Clear the share status message after a few seconds (UX polish)
     useEffect(() => {
         if (shareStatus) {
             const timeout = setTimeout(() => setShareStatus(null), 3000);
@@ -58,6 +59,7 @@ export default function ShareTriviaPage() {
         }
     }, [shareStatus]);
 
+    // Fire off request to Supabase to get matching users + resolve their signed profile pics
     async function fetchMatchingUsers(name: string) {
         setIsSearching(true);
         const usersWithSimilarName = await fetchMatchingUsersBySimilarName(name);
@@ -80,25 +82,25 @@ export default function ShareTriviaPage() {
         setIsSearching(false);
     }
 
+    // When user clicks to share the trivia with someone
     async function handleShare(user: ShareRecipient) {
         setShareStatus(null);
 
-        // Get all trivia shared with this user (as array of string IDs)
+        // Get the list of trivia already shared with this user
         const sharedTrivia = await getAllTriviaSharedWithUser(user);
         if (!sharedTrivia) {
             setShareStatus('Failed to fetch user data.');
             return;
         }
 
-        // Check if already shared
+        // Prevent duplicates
         if (sharedTrivia.includes(triviaid)) {
             setShareStatus(`"${triviaTitle}" was already shared with ${user.username}`);
             return;
         }
 
-        // Add new trivia ID
+        // Add this trivia to their list and update Supabase
         const updatedTriviaList = [...sharedTrivia, triviaid];
-
         const success = await updateTriviaSharedWithUser(user.id, updatedTriviaList);
 
         if (!success) {
@@ -124,6 +126,7 @@ export default function ShareTriviaPage() {
                         onChange={(e) => setQuery(e.target.value)}
                         autoFocus
                     />
+
                     {shareStatus && <div className="share-status-message">{shareStatus}</div>}
 
                     {query.trim() !== '' && (
@@ -134,7 +137,10 @@ export default function ShareTriviaPage() {
                                     className="search-user-card"
                                     onClick={() => handleShare(user)}
                                 >
-                                    <ProfilePicture src={user.profile_pic_url} alt={`${user.username}'s profile picture`} />
+                                    <ProfilePicture
+                                        src={user.profile_pic_url}
+                                        alt={`${user.username}'s profile picture`}
+                                    />
                                     <span>{user.username}</span>
                                 </div>
                             ))}
@@ -146,7 +152,10 @@ export default function ShareTriviaPage() {
                         </div>
                     )}
 
-                    <button className="share-button-container share-back-button" onClick={() => router.push('../dashboard')}>
+                    <button
+                        className="share-button-container share-back-button"
+                        onClick={() => router.push('../dashboard')}
+                    >
                         Back to Dashboard
                     </button>
                 </main>

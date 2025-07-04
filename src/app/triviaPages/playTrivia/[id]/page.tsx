@@ -1,39 +1,45 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { getTriviaById } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import {
-    TContent,
     TPlayer,
     TQuestion,
     TChoice,
+    TriviaContent,
     TriviaParams
 } from '@/app/interfaces/triviaTypes';
+import '../../../cssStyling/viewSharedTrivias.css';
 import '../../../cssStyling/playTrivia.css';
+
+const MIN_PLAYERS = 2;
+const MAX_PLAYERS = 10;
 
 export default function PlayTriviaPage() {
     const router = useRouter();
     const params = useParams() as TriviaParams;
     const id = params.id;
 
+    const boardRef = useRef<HTMLDivElement>(null);
+
     const [triviaTitle, setTriviaTitle] = useState<string>('');
-    const [triviaContent, setTriviaContent] = useState<TContent | null>(null);
+    const [triviaContent, setTriviaContent] = useState<TriviaContent | null>(null);
 
     const [numPlayers, setNumPlayers] = useState('');
-    // Players now have customizable names defaulting to empty strings
     const [players, setPlayers] = useState<TPlayer[]>([]);
     const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
 
     const [showGame, setShowGame] = useState(false);
+    const [canStartGame, setCanStartGame] = useState(false);
 
-    // Modal state
     const [modalOpen, setModalOpen] = useState(false);
     const [modalQuestion, setModalQuestion] = useState<TQuestion | null>(null);
-    const [modalCategoryIndex, setModalCategoryIndex] = useState<number | null>(null);
     const [modalQuestionIndex, setModalQuestionIndex] = useState<number | null>(null);
 
     const [modalMessage, setModalMessage] = useState<string>('');
+    const [uiMessage, setUiMessage] = useState<string>('');
+
     const [questionAnswered, setQuestionAnswered] = useState(false);
 
     // Fetch trivia data on mount
@@ -42,7 +48,7 @@ export default function PlayTriviaPage() {
         (async () => {
             const { trivia, error } = await getTriviaById(id);
             if (error) {
-                alert('Failed to load trivia: ' + error);
+                showUIMessage('Failed to load trivia: ' + error);
                 router.push('/dashboard');
                 return;
             }
@@ -51,60 +57,96 @@ export default function PlayTriviaPage() {
         })();
     }, [id, router]);
 
-    // Start game handler, initializes players with empty names and scores
-    function startGame() {
-        const n = Number(numPlayers);
-        if (isNaN(n) || n < 2 || n > 10) {
-            alert('Please enter a number of players between 2 and 10');
-            return;
-        }
+    // Set CSS grid columns dynamically based on category count
+    useEffect(() => {
+        if (!triviaContent || !boardRef.current) return;
+
+        const numCategories = Object.keys(triviaContent).length;
+        boardRef.current.style.gridTemplateColumns = `repeat(${numCategories}, minmax(180px, 1fr))`;
+    }, [triviaContent]);
+
+    // Validate player names
+    useEffect(() => {
+        const allNamesValid = players.length > 0 && players.every(p => p.name.trim().length > 0);
+        setCanStartGame(allNamesValid);
+    }, [players]);
+
+    function showUIMessage(message: string, duration: number = 1000) {
+        setUiMessage(message);
+        setTimeout(() => setUiMessage(''), duration);
+    }
+
+    function updatePlayerName(index: number, newName: string) {
+        setPlayers((prev) => {
+            const updated = [...prev];
+            updated[index].name = newName;
+            return updated;
+        });
+    }
+
+    function initPlayers() {
+        const n = Number(numPlayers || MIN_PLAYERS);
         const initialPlayers = Array.from({ length: n }, (_, i) => ({
             id: i + 1,
-            name: '',      // empty default player names
+            name: '',
             score: 0,
         }));
         setPlayers(initialPlayers);
         setCurrentPlayerIndex(0);
+    }
+
+    function getPlayerColor(index: number): string {
+        const colors = [
+            '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE',
+            '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE',
+            '#B2FF59', '#FFD740', '#FFAB40', '#FF6E40'
+        ];
+        return colors[index % colors.length];
+    }
+
+    function beginGame() {
+        const allNamesValid = players.every(p => p.name.trim().length > 0);
+        if (!allNamesValid) {
+            showUIMessage('Please enter a name for each player!');
+            return;
+        }
         setShowGame(true);
     }
 
-    // Update player name dynamically
-    function updatePlayerName(index: number, newName: string) {
-        setPlayers((prev) => {
-            const copy = [...prev];
-            copy[index].name = newName;
-            return copy;
-        });
-    }
-
-    // Handle question click to open modal
-    function openQuestionModal(categoryIdx: number, questionIdx: number) {
+    function openQuestionModal(categoryName: string, questionIdx: number) {
         if (!triviaContent) return;
-        const question = triviaContent.categories[categoryIdx].questions[questionIdx];
-        setModalQuestion(question);
-        setModalCategoryIndex(categoryIdx);
+        const questions = triviaContent[categoryName];
+        if (!questions || !questions[questionIdx]) return;
+
+        const rawQuestion = questions[questionIdx];
+        const convertedQuestion: TQuestion = {
+            question: rawQuestion.question,
+            points: rawQuestion.points,
+            choices: Object.entries(rawQuestion.choices).map(([key, text]) => ({
+                text,
+                isCorrect: key === rawQuestion.answer,
+            })),
+        };
+
+        setModalQuestion(convertedQuestion);
         setModalQuestionIndex(questionIdx);
         setModalMessage('');
         setQuestionAnswered(false);
         setModalOpen(true);
     }
 
-    // Move to next player
     function nextPlayer() {
         setCurrentPlayerIndex((prev) => (prev + 1) % players.length);
     }
 
-    // Close modal and reset modal state
     function closeModal() {
         setModalOpen(false);
         setModalQuestion(null);
-        setModalCategoryIndex(null);
         setModalQuestionIndex(null);
         setModalMessage('');
         setQuestionAnswered(false);
     }
 
-    // When "I Give Up" clicked: 0 points, next player
     function handleGiveUp() {
         if (questionAnswered) return;
         setModalMessage('No points awarded. Moving to next player.');
@@ -115,21 +157,18 @@ export default function PlayTriviaPage() {
         }, 1500);
     }
 
-    // Placeholder for Steal feature
     function handleSteal() {
-        alert('Steal functionality not yet implemented.');
+        showUIMessage('Steal functionality not yet implemented.');
     }
 
-    // When a choice is clicked, award points and proceed
     function handleChoiceClick(choice: TChoice) {
         if (questionAnswered) return;
-        if (modalQuestionIndex === null || modalCategoryIndex === null || !triviaContent) return;
+        if (modalQuestionIndex === null || !triviaContent) return;
 
         if (choice.isCorrect) {
             setModalMessage('Correct! Points awarded.');
             setQuestionAnswered(true);
 
-            // Add points to current player
             setPlayers((prev) => {
                 const newPlayers = [...prev];
                 newPlayers[currentPlayerIndex].score += modalQuestion?.points || 0;
@@ -151,17 +190,61 @@ export default function PlayTriviaPage() {
     }
 
     return (
-        <div className="play-container">
-            <header className="play-header">
-                <h1 className="trivia-title">{triviaTitle}</h1>
-                <button
-                    className="quit-btn"
-                    onClick={() => router.push('../dashboard')}
-                    aria-label="Quit Trivia and return to dashboard"
-                >
-                    Quit Trivia and Return to Dashboard
+        <div className="dashboard-container">
+            <h1 className="dashboard-title">{triviaTitle}</h1>
+            <p className="dashboard-subtext">
+                {showGame ? (
+                    <>Game in progress!</>
+                ) : (
+                    'Set up your players and start the game!'
+                )}
+            </p>
+
+            <div className="button-row">
+                <button className="dashboard-back-button" onClick={() => router.push('../dashboard')}>
+                    ← Back to Dashboard
                 </button>
-                {showGame && (
+                <button className="dashboard-back-button" onClick={() => router.push('../viewSharedTrivias')}>
+                    Play a different trivia
+                </button>
+            </div>
+
+            {showGame && (
+                <div className="players-scoreboard">
+                    {players.map((p, i) => (
+                        <div
+                            key={p.id}
+                            className={`scoreboard-entry ${i === currentPlayerIndex ? 'active-player' : ''}`}
+                            style={{ borderColor: i === currentPlayerIndex ? '#db2777' : '#fbbf24' }}
+                        >
+                            <span className="scoreboard-name" style={{ color: getPlayerColor(i) }}>
+                                {p.name || `Player ${p.id}`}
+                            </span>
+                            <span className="scoreboard-points">{p.score} pts</span>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {uiMessage && <div className="ui-message-banner">{uiMessage}</div>}
+
+            {!players.length ? (
+                <div className="players-input-box">
+                    <label htmlFor="numPlayers">Number of players: {numPlayers || MIN_PLAYERS}</label>
+                    <input
+                        id="numPlayers"
+                        type="range"
+                        min={MIN_PLAYERS}
+                        max={MAX_PLAYERS}
+                        value={numPlayers || MIN_PLAYERS}
+                        onChange={(e) => setNumPlayers(e.target.value)}
+                    />
+                    <button className="start-btn" onClick={initPlayers}>
+                        Confirm Player Count
+                    </button>
+                </div>
+            ) : !showGame ? (
+                <>
                     <div className="players-row">
                         {players.map((p, i) => (
                             <div
@@ -179,44 +262,40 @@ export default function PlayTriviaPage() {
                             </div>
                         ))}
                     </div>
-                )}
-            </header>
-
-            {!showGame ? (
-                <div className="players-input-box">
-                    <label htmlFor="numPlayers">Number of players: {numPlayers || 2}</label>
-                    <input
-                        id="numPlayers"
-                        type="range"
-                        min={2}
-                        max={10}
-                        value={numPlayers || '2'}
-                        onChange={(e) => setNumPlayers(e.target.value)}
-                    />
-                    <button className="start-btn" onClick={startGame}>
+                    <p className="dashboard-subtext">Please enter a name for each player to begin.</p>
+                    <button
+                        className="start-btn"
+                        onClick={beginGame}
+                        style={{ marginTop: '1rem' }}
+                    >
                         Start Game
                     </button>
-                </div>
+                </>
             ) : (
-                <div className="trivia-grid">
-                    {triviaContent && Array.isArray(triviaContent.categories) && triviaContent.categories.map((category, catIdx) => (
-                        <div key={category.name} className="category-column">
-                            <h3 className="category-name">{category.name}</h3>
-                            {category.questions.map((question, qIdx) => (
-                                <button
-                                    key={`${category.name}-${qIdx}`}
-                                    className="question-button"
-                                    onClick={() => openQuestionModal(catIdx, qIdx)}
-                                >
-                                    {question.points} pts
-                                </button>
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                triviaContent && Object.keys(triviaContent).length > 0 ? (
+                    <div className="trivia-grid" ref={boardRef}>
+                        {Object.entries(triviaContent).map(([categoryName, questions]) => (
+                            <div key={categoryName} className="category-column">
+                                <h3 className="category-name">{categoryName}</h3>
+                                {[...questions]
+                                    .sort((a, b) => a.points - b.points)
+                                    .map((question, qIdx) => (
+                                        <button
+                                            key={`${categoryName}-${qIdx}`}
+                                            className="question-button"
+                                            onClick={() => openQuestionModal(categoryName, qIdx)}
+                                        >
+                                            {question.points} pts
+                                        </button>
+                                    ))}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p>No trivia categories found.</p>
+                )
             )}
 
-            {/* Modal */}
             {modalOpen && modalQuestion && (
                 <div className="modal-overlay" onClick={() => !questionAnswered && closeModal()}>
                     <div

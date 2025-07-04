@@ -60,8 +60,6 @@ export function evaluateStealAnswer(
     };
   }
 
-  console.log('[evaluateStealAnswer] awarding points', points, 'to player', currentStealerIndex);
-
   // Award points to successful stealer
   const updatedPlayers = [...players];
   updatedPlayers[currentStealerIndex].score += points;

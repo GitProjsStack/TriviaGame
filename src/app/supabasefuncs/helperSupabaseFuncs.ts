@@ -41,7 +41,7 @@ export async function fetchMatchingUsersBySimilarName(
   const { data, error } = await supabase
     .from(CLIENTS_TABLE)
     .select(SELECT_CLIENT_FIELDS)
-    .ilike(COL_USERNAME, `${name}%`);
+    .ilike(COL_USERNAME, `%${name}%`);
 
   if (error || !data) {
     console.error('Error fetching users:', error);

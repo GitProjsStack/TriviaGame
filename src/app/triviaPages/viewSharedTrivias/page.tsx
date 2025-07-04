@@ -10,6 +10,7 @@ import {
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import { SharedTrivia } from '@/app/interfaces/triviaTypes';
 import '../../cssStyling/viewSharedTrivias.css';
+import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
 export default function ViewSharedTrivias() {
   const router = useRouter();
@@ -59,13 +60,13 @@ export default function ViewSharedTrivias() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">Play Shared Trivias</h1>
+      <h1 className="dashboard-title">{BUTTON_LABELS.PLAY_SHARED.generic}</h1>
       <p className="dashboard-subtext">
-        Choose from a list of trivia games shared with you and start playing!
+        {BUTTON_LABELS.PLAY_SHARED.generic_description}
       </p>
 
       <button className="dashboard-back-button" onClick={() => router.push('./dashboard')}>
-        ← Back to Dashboard
+        {BUTTON_LABELS.BACK_TO_DASHBOARD}
       </button>
 
       {loading ? (

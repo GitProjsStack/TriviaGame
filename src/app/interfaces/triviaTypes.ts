@@ -39,7 +39,7 @@ export interface TContent {
 export interface TPlayer {
   id: number;
   score: number;
-  name?: string;
+  name: string;
 }
 
 export type ShareRecipient = {

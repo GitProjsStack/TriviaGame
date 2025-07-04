@@ -146,7 +146,7 @@ export default function ShareTriviaPage() {
                         </div>
                     )}
 
-                    <button className="share-back-button" onClick={() => router.push('../dashboard')}>
+                    <button className="share-button-container share-back-button" onClick={() => router.push('../dashboard')}>
                         Back to Dashboard
                     </button>
                 </main>

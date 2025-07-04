@@ -11,6 +11,17 @@ import { Question, TriviaGame } from '../../../interfaces/triviaTypes';
 import '../../../cssStyling/editTriviastyling.css';
 
 const MAX_POINTS_PER_QUESTION = 10000; // Maximum points allowed per question
+const MIN_POINTS_PER_QUESTION = 1; // Minimum points required per question
+
+const MAX_CHOICES = 6; // Maximum choices allowed per question
+const MIN_CHOICES = 2; // Minimum choices required per question
+
+const MAX_QUESTIONS_PER_CATEGORY = 10; // Maximum questions allowed per category
+const MIN_QUESTIONS_PER_CATEGORY = 1; // Minimum questions required per category
+
+const MAX_CATEGORIES = 10; // Maximum categories allowed in a trivia
+const MIN_CATEGORIES = 1; // Minimum categories required in a trivia
+
 const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
 const generateChoice = () => ({ id: crypto.randomUUID(), text: '' });
@@ -61,13 +72,13 @@ export default function EditTrivia() {
     };
 
     const addChoice = () => {
-        if (newChoices.length < 10) {
+        if (newChoices.length < MAX_CHOICES) {
             setNewChoices((prev) => [...prev, generateChoice()]);
         }
     };
 
     const removeChoice = (id: string) => {
-        if (newChoices.length <= 2) return;
+        if (newChoices.length <= MIN_CHOICES) return;
         setNewChoices((prev) => prev.filter((c) => c.id !== id));
         if (selectedAnswerId === id) setSelectedAnswerId(null);
     };
@@ -131,7 +142,11 @@ export default function EditTrivia() {
 
     const submitNewCategory = async () => {
         const trimmed = newCategoryName.trim();
-        if (!trimmed || !trivia) return setCategoryError('Category name is required.');
+        if (!trimmed || !trivia) {
+            setCategoryError('Category name is required.');
+            setTimeout(() => setCategoryError(null), 2000);
+            return;
+        }
         if (trivia.content[trimmed]) return setCategoryError('Category already exists.');
 
         const updated = {
@@ -190,15 +205,15 @@ export default function EditTrivia() {
         if (!trivia) return;
 
         const categoryCount = Object.keys(trivia.content).length;
-        if (categoryCount === 0 || categoryCount > 9) {
-            setSubmitMessage('Trivia must have between 1 and 9 categories.');
+        if (categoryCount === 0 || categoryCount > MAX_CATEGORIES) {
+            setSubmitMessage(`Trivia must have between ${MIN_CATEGORIES} and ${MAX_CATEGORIES} categories.`);
             setTimeout(() => setSubmitMessage(null), 4000);
             return;
         }
 
         for (const [cat, questions] of Object.entries(trivia.content)) {
-            if (questions.length < 1 || questions.length > 10) {
-                setSubmitMessage(`Category "${cat}" must have between 1 and 10 questions.`);
+            if (questions.length < MIN_QUESTIONS_PER_CATEGORY || questions.length > MAX_QUESTIONS_PER_CATEGORY) {
+                setSubmitMessage(`Category "${cat}" must have between ${MIN_QUESTIONS_PER_CATEGORY} and ${MAX_QUESTIONS_PER_CATEGORY} questions.`);
                 setTimeout(() => setSubmitMessage(null), 4000);
                 return;
             }
@@ -335,7 +350,7 @@ export default function EditTrivia() {
                                     }
 
                                     if (num <= 0) {
-                                        setPointsError('Points must be at least 1');
+                                        setPointsError(`Each question must have a minimum of ${MIN_POINTS_PER_QUESTION} point(s)`);
                                         return;
                                     }
 
@@ -346,7 +361,7 @@ export default function EditTrivia() {
 
                                     setNewPoints(num);
                                 }}
-                                min={1}
+                                min={MIN_POINTS_PER_QUESTION}
                                 max={MAX_POINTS_PER_QUESTION} // Visual hint for browsers
                             />
                         </label>
@@ -379,14 +394,14 @@ export default function EditTrivia() {
                                     onClick={() => removeChoice(c.id)}
                                     className="remove-choice-btn"
                                     type="button"
-                                    disabled={newChoices.length <= 2}
+                                    disabled={newChoices.length <= MIN_CHOICES}
                                 >
                                     ✕
                                 </button>
                             </div>
                         ))}
 
-                        <button className="add-choice-btn" onClick={addChoice} disabled={newChoices.length >= 10}>
+                        <button className="add-choice-btn" onClick={addChoice} disabled={newChoices.length >= MAX_CHOICES}>
                             + Add Choice
                         </button>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { getTriviaById } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import {
@@ -20,8 +20,6 @@ export default function PlayTriviaPage() {
     const router = useRouter();
     const params = useParams() as TriviaParams;
     const id = params.id;
-
-    const boardRef = useRef<HTMLDivElement>(null);
 
     const [triviaTitle, setTriviaTitle] = useState<string>('');
     const [triviaContent, setTriviaContent] = useState<TriviaContent | null>(null);
@@ -56,14 +54,6 @@ export default function PlayTriviaPage() {
             setTriviaContent(trivia.content);
         })();
     }, [id, router]);
-
-    // Set CSS grid columns dynamically based on category count
-    useEffect(() => {
-        if (!triviaContent || !boardRef.current) return;
-
-        const numCategories = Object.keys(triviaContent).length;
-        boardRef.current.style.gridTemplateColumns = `repeat(${numCategories}, minmax(180px, 1fr))`;
-    }, [triviaContent]);
 
     // Validate player names
     useEffect(() => {
@@ -273,7 +263,7 @@ export default function PlayTriviaPage() {
                 </>
             ) : (
                 triviaContent && Object.keys(triviaContent).length > 0 ? (
-                    <div className="trivia-grid" ref={boardRef}>
+                    <div className="trivia-grid">
                         {Object.entries(triviaContent).map(([categoryName, questions]) => (
                             <div key={categoryName} className="category-column">
                                 <h3 className="category-name">{categoryName}</h3>

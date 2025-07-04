@@ -93,12 +93,12 @@
 }
 
 .trivia-grid {
-  display: grid !important;
+  display: grid;
   gap: 10px;
   margin-top: 2rem;
-  grid-auto-rows: min-content;
   padding: 1rem;
   border-radius: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 @media (max-width: 768px) {

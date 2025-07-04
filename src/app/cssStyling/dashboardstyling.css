@@ -20,11 +20,16 @@
 
 .dashboard-sections {
   display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.dashboard-row {
+  display: flex;
+  gap: 1.5rem;
   flex-wrap: wrap;
-  gap: 2rem;
   justify-content: center;
-  width: 100%;
-  max-width: 1000px;
 }
 
 .dashboard-card {
@@ -43,6 +48,15 @@
 .dashboard-card:hover {
   transform: scale(1.03);
   box-shadow: 0 12px 32px rgba(253, 224, 71, 0.35);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  flex: 1 1 300px;
+  min-width: 280px;
 }
 
 .dashboard-card h2 {

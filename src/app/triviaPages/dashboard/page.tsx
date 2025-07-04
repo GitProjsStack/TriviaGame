@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { handleSignOut } from '../../supabasefuncs/helperSupabaseFuncs';
+import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import ProfilePicture from '../../components/ProfilePicture';
 import '../../cssStyling/dashboardstyling.css';
 
@@ -23,8 +24,8 @@ export default function Dashboard() {
             style={{ maxWidth: '420px' }}
             onClick={() => router.push('./howToPlay')}
           >
-            <h2>How to Play & Rules</h2>
-            <p>Learn how TriviaShare works: creating, sharing, playing, stealing, and more.</p>
+            <h2>{BUTTON_LABELS.HOW_TO_PLAY.title}</h2>
+            <p>{BUTTON_LABELS.HOW_TO_PLAY.description}</p>
           </div>
         </div>
 
@@ -34,16 +35,16 @@ export default function Dashboard() {
             className="dashboard-card half-width"
             onClick={() => router.push('./createEditTrivias')}
           >
-            <h2>Create, Edit, or Share a Trivia Game</h2>
-            <p>Build new trivia or update existing ones.</p>
+            <h2>{BUTTON_LABELS.CREATE_EDIT_SHARE.title}</h2>
+            <p>{BUTTON_LABELS.CREATE_EDIT_SHARE.description}</p>
           </div>
 
           <div
             className="dashboard-card half-width"
             onClick={() => router.push('./viewSharedTrivias')}
           >
-            <h2>Play Trivias Shared With Me</h2>
-            <p>Try trivia games shared by friends or other users.</p>
+            <h2>{BUTTON_LABELS.PLAY_SHARED.title}</h2>
+            <p>{BUTTON_LABELS.PLAY_SHARED.description}</p>
           </div>
         </div>
       </div>
@@ -53,7 +54,7 @@ export default function Dashboard() {
         onClick={() => handleSignOut(() => router.push('../..'))}
         className="signout-button"
       >
-        Sign Out
+        {BUTTON_LABELS.SIGN_OUT}
       </button>
     </div>
   );

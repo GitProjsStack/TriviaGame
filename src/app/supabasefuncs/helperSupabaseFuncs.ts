@@ -38,15 +38,23 @@ export async function getAuthenticatedUser() {
 export async function fetchMatchingUsersBySimilarName(
   name: string
 ): Promise<ShareRecipient[]> {
+
   const { data, error } = await supabase
     .from(CLIENTS_TABLE)
     .select(SELECT_CLIENT_FIELDS)
     .ilike(COL_USERNAME, `%${name}%`);
 
-  if (error || !data) {
-    console.error('Error fetching users:', error);
+  if (error) {
+    console.error(`❌ Error fetching users by name ${name}`, error.message);
     return [];
   }
+
+  if (!data || data.length === 0) {
+    console.warn('⚠️ No users found matching:', name);
+    return [];
+  }
+
+  console.log(`✅ Found ${data.length} user(s) matching "${name}":`, data);
 
   return data.map(toShareRecipient);
 }

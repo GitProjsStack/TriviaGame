@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import {
   getAuthenticatedUser,
   getMyTriviaGames,
@@ -11,6 +12,8 @@ import {
 } from '../../supabasefuncs/helperSupabaseFuncs';
 import { TriviaGame } from '../../interfaces/triviaTypes';
 import '../../cssStyling/createEditTrivias.css';
+
+const CREATE_NEW_TRIVIA = 'Create New Trivia';
 
 export default function CreateEditTrivias() {
   const router = useRouter();
@@ -115,7 +118,7 @@ export default function CreateEditTrivias() {
 
   return (
     <div className="cet-container">
-      <h1 className="cet-title">Create, Edit, or Share a Trivia!</h1>
+      <h1 className="cet-title">{BUTTON_LABELS.CREATE_EDIT_SHARE.title}!</h1>
       <p className="cet-subtext">
         Design new trivia games or update ones you’ve already created.
       </p>
@@ -124,7 +127,7 @@ export default function CreateEditTrivias() {
       {deleteErrorMsg && <p className="cet-error">{deleteErrorMsg}</p>}
 
       <button className="cet-back-button" onClick={() => router.push('./dashboard')}>
-        ← Back to Dashboard
+        {BUTTON_LABELS.BACK_TO_DASHBOARD}
       </button>
 
       {loading ? (
@@ -160,13 +163,13 @@ export default function CreateEditTrivias() {
       )}
 
       <button className="cet-create-btn" onClick={() => setShowModal(true)}>
-        + Create New Trivia
+        + {CREATE_NEW_TRIVIA}
       </button>
 
       {showModal && (
         <div className="cet-modal-overlay" onClick={() => setShowModal(false)}>
           <div className="cet-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Create New Trivia</h2>
+            <h2>{CREATE_NEW_TRIVIA}</h2>
             <input
               type="text"
               placeholder="Trivia Title"
@@ -178,7 +181,7 @@ export default function CreateEditTrivias() {
             {errorMsg && <p className="cet-error">{errorMsg}</p>}
             <div className="cet-modal-actions">
               <button onClick={() => setShowModal(false)} disabled={creating}>
-                Cancel
+                {BUTTON_LABELS.CANCEL}
               </button>
               <button onClick={handleCreateTrivia} disabled={creating}>
                 {creating ? 'Creating...' : 'Create'}

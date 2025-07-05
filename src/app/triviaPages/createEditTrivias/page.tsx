@@ -13,7 +13,6 @@ import {
   deleteTriviaById,
 } from '../../supabasefuncs/helperSupabaseFuncs';
 import { TriviaGame } from '../../interfaces/triviaTypes';
-import '../../cssStyling/createEditTrivias.css';
 
 const CREATE_NEW_TRIVIA = 'Create New Trivia';
 
@@ -34,16 +33,7 @@ export default function CreateEditTrivias() {
 
   // Load trivia games created by the logged-in user on page mount
   useEffect(() => {
-    const fetchTriviaGames = async () => {
-      const user = await getAuthenticatedUser();
-      if (!user) return;
-
-      const games = await getMyTriviaGames(user.id);
-      setTriviaGames(games);
-      setLoading(false);
-    };
-
-    fetchTriviaGames();
+    refreshTriviaList();
   }, []);
 
   // Handle logic for creating a new trivia
@@ -121,12 +111,35 @@ export default function CreateEditTrivias() {
     setDeletingId(null);
   };
 
+  const refreshTriviaList = async () => {
+    setLoading(true);
+    const user = await getAuthenticatedUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const games = await getMyTriviaGames(user.id);
+    setTriviaGames(games);
+    setLoading(false);
+  };
+
+  const handleCloseEdit = async () => {
+    setEditingTriviaId(null);
+    await refreshTriviaList(); // fetch again from Supabase
+  };
+
+  const handleCloseShare = async () => {
+    setSharingTriviaId(null);
+    await refreshTriviaList(); // fetch again from Supabase
+  };
+
   return (
     <div className="cet-container">
       {editingTriviaId ? (
-        <EditTrivia id={editingTriviaId} onClose={() => setEditingTriviaId(null)} />
+        <EditTrivia id={editingTriviaId} onClose={handleCloseEdit} />
       ) : sharingTriviaId ? (
-        <ShareTrivia id={sharingTriviaId} onClose={() => setSharingTriviaId(null)} />
+        <ShareTrivia id={sharingTriviaId} onClose={handleCloseShare} />
       ) : (
         <>
           <h1 className="cet-title">{BUTTON_LABELS.CREATE_EDIT_SHARE.title}!</h1>

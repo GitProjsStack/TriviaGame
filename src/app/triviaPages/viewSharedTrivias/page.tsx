@@ -10,7 +10,6 @@ import {
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import { SharedTrivia } from '@/app/interfaces/triviaTypes';
 import PlayTriviaPage from '../playTrivia/page';
-import '../../cssStyling/viewSharedTrivias.css';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
 export default function ViewSharedTrivias() {
@@ -113,8 +112,8 @@ export default function ViewSharedTrivias() {
                   onClick={() => {
                     setPlayLoadingId(triviaId);
                     setTimeout(() => {
-                      router.push(`./playTrivia/${triviaId}`);
-                    }, 2000); // Delay is mostly for fun UX / spinner effect
+                      setPlayingTriviaId(triviaId); // NOT router.push
+                    }, 1000);
                   }}
                 >
                   {playLoadingId === triviaId ? <div className="mini-spinner" /> : '▶ Play'}

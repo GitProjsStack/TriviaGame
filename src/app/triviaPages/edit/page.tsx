@@ -8,7 +8,6 @@ import {
 } from '../../supabasefuncs/helperSupabaseFuncs';
 import { BUTTON_LABELS, EDIT_TRIVIA_LIMITS } from '@/app/constants/gameSettings';
 import { Question, TriviaGame, TriviaParams } from '../../interfaces/triviaTypes';
-import '../../../cssStyling/editTriviastyling.css';
 
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
 const generateChoice = () => ({ id: crypto.randomUUID(), text: '' });

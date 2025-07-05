@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { handleSignOut } from '../../supabasefuncs/helperSupabaseFuncs';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import ProfilePicture from '../../components/ProfilePicture';
-import '../../cssStyling/dashboardstyling.css';
 
 export default function Dashboard() {
   const router = useRouter();

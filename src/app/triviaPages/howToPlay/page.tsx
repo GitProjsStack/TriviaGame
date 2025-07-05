@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import { MIN_PLAYERS, MAX_PLAYERS, BUTTON_LABELS } from '../../constants/gameSettings';
-import '../../cssStyling/howToPlay.css';
 
 export default function HowToPlayPage() {
   const router = useRouter();

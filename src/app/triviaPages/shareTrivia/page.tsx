@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import {
     generateUSERProfilePicSignedUrl,
     fetchMatchingUsersBySimilarName,
@@ -11,7 +10,6 @@ import {
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import { ShareRecipient, TriviaParams } from '@/app/interfaces/triviaTypes';
 
-import '../../../cssStyling/shareTrivia.css';
 import ProfilePicture from '@/app/components/ProfilePicture';
 
 
@@ -153,7 +151,7 @@ export default function ShareTrivia({ id, onClose }: TriviaParams) {
                         className="share-button-container share-back-button"
                         onClick={onClose}
                     >
-                        {BUTTON_LABELS.BACK_TO_DASHBOARD}
+                        🔙 Back to My Trivia List
                     </button>
                 </main>
             )}

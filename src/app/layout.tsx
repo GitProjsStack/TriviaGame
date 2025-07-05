@@ -1,6 +1,18 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+// importing styles:
+import './cssStyling/createEditTrivias.css';
+import './cssStyling/dashboardstyling.css';
+import './cssStyling/editTriviastyling.css';
+import './cssStyling/homepagestyling.css';
+import './cssStyling/howToPlay.css';
+import './cssStyling/playTrivia.css';
+import './cssStyling/ProfilePicture.css';
+import './cssStyling/shareTrivia.css';
+import './cssStyling/triviaEndScreen.css';
+import './cssStyling/viewSharedTrivias.css';
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

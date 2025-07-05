@@ -23,8 +23,6 @@ import {
     evaluateStealAnswer,
 } from '@/app/components/stealQuestionImplementation';
 import TriviaEndScreen from '../triviaEndScreen/page';
-import '../../../cssStyling/viewSharedTrivias.css';
-import '../../../cssStyling/playTrivia.css';
 
 const COLORS = EDIT_TRIVIA_LIMITS.COLORS;
 

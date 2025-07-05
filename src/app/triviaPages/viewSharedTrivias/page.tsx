@@ -9,6 +9,7 @@ import {
   generateUSERProfilePicSignedUrl,
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import { SharedTrivia } from '@/app/interfaces/triviaTypes';
+import PlayTriviaPage from '../playTrivia/page';
 import '../../cssStyling/viewSharedTrivias.css';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
@@ -17,6 +18,7 @@ export default function ViewSharedTrivias() {
   const [sharedTrivias, setSharedTrivias] = useState<SharedTrivia[]>([]);
   const [loading, setLoading] = useState(true);
   const [playLoadingId, setPlayLoadingId] = useState<string | null>(null);
+  const [playingTriviaId, setPlayingTriviaId] = useState<string | null>(null);
 
   const fetchSharedTrivias = async () => {
     setLoading(true);
@@ -57,6 +59,14 @@ export default function ViewSharedTrivias() {
       alert('Failed to remove trivia.');
     }
   };
+
+  if (playingTriviaId) {
+    return (
+      <div className="dashboard-container">
+        <PlayTriviaPage id={playingTriviaId} onClose={() => setPlayingTriviaId(null)} />
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-container">

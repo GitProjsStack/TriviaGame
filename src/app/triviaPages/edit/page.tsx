@@ -1,23 +1,19 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
     getTriviaById,
     updateTriviaContent,
     updateTriviaStatus
-} from '../../../supabasefuncs/helperSupabaseFuncs';
+} from '../../supabasefuncs/helperSupabaseFuncs';
 import { BUTTON_LABELS, EDIT_TRIVIA_LIMITS } from '@/app/constants/gameSettings';
-import { Question, TriviaGame } from '../../../interfaces/triviaTypes';
+import { Question, TriviaGame, TriviaParams } from '../../interfaces/triviaTypes';
 import '../../../cssStyling/editTriviastyling.css';
 
-const prevPagePath = '../createEditTrivias';
 const indexToLetter = (i: number) => String.fromCharCode(65 + i);
 const generateChoice = () => ({ id: crypto.randomUUID(), text: '' });
 
-export default function EditTrivia() {
-    const { id } = useParams() as { id: string };
-    const router = useRouter();
+export default function EditTrivia({ id, onClose }: TriviaParams) {
 
     const [trivia, setTrivia] = useState<TriviaGame | null>(null);
     const [loading, setLoading] = useState(false);
@@ -222,7 +218,7 @@ export default function EditTrivia() {
 
     return (
         <div className="edit-container">
-            <button className="back-button" onClick={() => router.push(prevPagePath)}>
+            <button className="back-button" onClick={onClose}>
                 ← Back
             </button>
 
@@ -450,10 +446,8 @@ export default function EditTrivia() {
                                     try {
                                         await updateTriviaStatus(trivia.id, 'completed');
                                         setSubmitMessage('Trivia finalized! Redirecting...');
-                                        // Wait 5 seconds then redirect:
-                                        setTimeout(() => {
-                                            router.push(prevPagePath);
-                                        }, 5000);
+                                        // Wait 3 seconds then redirect:
+                                        setTimeout(onClose, 3000);
                                     } catch {
                                         setSubmitMessage('Failed to finalize trivia.');
                                         setTimeout(() => setSubmitMessage(null), 4000);

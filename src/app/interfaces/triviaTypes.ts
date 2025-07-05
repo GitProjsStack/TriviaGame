@@ -52,11 +52,6 @@ export type ShareRecipient = {
     profile_pic_url: string | null;  // URL of user's profile picture (can be null)
 };
 
-// Params passed via routes or queries, e.g., trivia ID from URL
-export type TriviaParams = {
-    id: string;                   // Trivia game ID string
-};
-
 // Represents a trivia game shared with the current user along with sharer info
 export type SharedTrivia = {
   triviaId: string;               // Shared trivia ID
@@ -64,4 +59,9 @@ export type SharedTrivia = {
   creatorId: string;              // Creator user ID
   sharerUsername: string;         // Username of person who shared the trivia
   sharerProfilePicUrl: string | null;  // Profile picture URL of sharer
+};
+
+export type TriviaParams = {
+    id: string;
+    onClose: () => void;
 };

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import EditTrivia from '../edit/page';
+import ShareTrivia from '../shareTrivia/page';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import {
   getAuthenticatedUser,
@@ -19,6 +21,9 @@ export default function CreateEditTrivias() {
   const router = useRouter();
   const [triviaGames, setTriviaGames] = useState<TriviaGame[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [editingTriviaId, setEditingTriviaId] = useState<string | null>(null);
+  const [sharingTriviaId, setSharingTriviaId] = useState<string | null>(null);
 
   const [showModal, setShowModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -118,77 +123,85 @@ export default function CreateEditTrivias() {
 
   return (
     <div className="cet-container">
-      <h1 className="cet-title">{BUTTON_LABELS.CREATE_EDIT_SHARE.title}!</h1>
-      <p className="cet-subtext">
-        Design new trivia games or update ones you’ve already created.
-      </p>
-
-      {errorMsg && <p className="cet-error">{errorMsg}</p>}
-      {deleteErrorMsg && <p className="cet-error">{deleteErrorMsg}</p>}
-
-      <button className="cet-back-button" onClick={() => router.push('./dashboard')}>
-        {BUTTON_LABELS.BACK_TO_DASHBOARD}
-      </button>
-
-      {loading ? (
-        <p>Loading your trivia games...</p>
-      ) : triviaGames.length === 0 ? (
-        <p>You haven’t created any trivia games yet.</p>
+      {editingTriviaId ? (
+        <EditTrivia id={editingTriviaId} onClose={() => setEditingTriviaId(null)} />
+      ) : sharingTriviaId ? (
+        <ShareTrivia id={sharingTriviaId} onClose={() => setSharingTriviaId(null)} />
       ) : (
-        <div className="cet-sections">
-          {triviaGames.map((game) => (
-            <div key={game.id} className="cet-card">
-              <h2>{game.title}</h2>
-              <p>Status: {game.status}</p>
-              <div className="cet-card-actions">
-                {game.status !== 'completed' && (
-                  <button onClick={() => router.push(`./edit/${game.id}`)}>✏️ Edit</button>
-                )}
-                <button
-                  onClick={() => handleDeleteTrivia(game.id)}
-                  disabled={deletingId === game.id}
-                >
-                  {deletingId === game.id ? 'Deleting...' : '🗑️ Delete'}
-                </button>
-                <button
-                  disabled={game.status !== 'completed'}
-                  onClick={() => router.push(`./shareTrivia/${game.id}`)}
-                >
-                  📤 Share
-                </button>
+        <>
+          <h1 className="cet-title">{BUTTON_LABELS.CREATE_EDIT_SHARE.title}!</h1>
+          <p className="cet-subtext">
+            Design new trivia games or update ones you’ve already created.
+          </p>
+
+          {errorMsg && <p className="cet-error">{errorMsg}</p>}
+          {deleteErrorMsg && <p className="cet-error">{deleteErrorMsg}</p>}
+
+          <button className="cet-back-button" onClick={() => router.push('./dashboard')}>
+            {BUTTON_LABELS.BACK_TO_DASHBOARD}
+          </button>
+
+          {loading ? (
+            <p>Loading your trivia games...</p>
+          ) : triviaGames.length === 0 ? (
+            <p>You haven’t created any trivia games yet.</p>
+          ) : (
+            <div className="cet-sections">
+              {triviaGames.map((game) => (
+                <div key={game.id} className="cet-card">
+                  <h2>{game.title}</h2>
+                  <p>Status: {game.status}</p>
+                  <div className="cet-card-actions">
+                    {game.status !== 'completed' && (
+                      <button onClick={() => setEditingTriviaId(game.id)}>✏️ Edit</button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteTrivia(game.id)}
+                      disabled={deletingId === game.id}
+                    >
+                      {deletingId === game.id ? 'Deleting...' : '🗑️ Delete'}
+                    </button>
+                    <button
+                      disabled={game.status !== 'completed'}
+                      onClick={() => setSharingTriviaId(game.id)}
+                    >
+                      📤 Share
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button className="cet-create-btn" onClick={() => setShowModal(true)}>
+            + {CREATE_NEW_TRIVIA}
+          </button>
+
+          {showModal && (
+            <div className="cet-modal-overlay" onClick={() => setShowModal(false)}>
+              <div className="cet-modal" onClick={(e) => e.stopPropagation()}>
+                <h2>{CREATE_NEW_TRIVIA}</h2>
+                <input
+                  type="text"
+                  placeholder="Trivia Title"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="cet-input"
+                  disabled={creating}
+                />
+                {errorMsg && <p className="cet-error">{errorMsg}</p>}
+                <div className="cet-modal-actions">
+                  <button onClick={() => setShowModal(false)} disabled={creating}>
+                    {BUTTON_LABELS.CANCEL}
+                  </button>
+                  <button onClick={handleCreateTrivia} disabled={creating}>
+                    {creating ? 'Creating...' : 'Create'}
+                  </button>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-
-      <button className="cet-create-btn" onClick={() => setShowModal(true)}>
-        + {CREATE_NEW_TRIVIA}
-      </button>
-
-      {showModal && (
-        <div className="cet-modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="cet-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{CREATE_NEW_TRIVIA}</h2>
-            <input
-              type="text"
-              placeholder="Trivia Title"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              className="cet-input"
-              disabled={creating}
-            />
-            {errorMsg && <p className="cet-error">{errorMsg}</p>}
-            <div className="cet-modal-actions">
-              <button onClick={() => setShowModal(false)} disabled={creating}>
-                {BUTTON_LABELS.CANCEL}
-              </button>
-              <button onClick={handleCreateTrivia} disabled={creating}>
-                {creating ? 'Creating...' : 'Create'}
-              </button>
-            </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );

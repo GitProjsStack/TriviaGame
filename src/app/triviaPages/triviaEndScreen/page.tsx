@@ -11,8 +11,6 @@ interface TriviaEndScreenProps {
     players: TPlayer[];
 }
 
-const TEMP_REROUTE_PATH = '../dashboard';
-
 export default function TriviaEndScreen({ players }: TriviaEndScreenProps) {
     const router = useRouter();
     const { winners } = getWinners(players);

@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { getTriviaById } from '@/app/supabasefuncs/helperSupabaseFuncs';
-import { 
+import {
     MIN_PLAYERS,
     MAX_PLAYERS,
     BUTTON_LABELS,
     EDIT_TRIVIA_LIMITS
- } from '@/app/constants/gameSettings';
+} from '@/app/constants/gameSettings';
 import {
     TPlayer,
     TQuestion,
@@ -22,16 +22,14 @@ import {
     isStealOver,
     evaluateStealAnswer,
 } from '@/app/components/stealQuestionImplementation';
-import TriviaEndScreen from '../../triviaEndScreen/page';
+import TriviaEndScreen from '../triviaEndScreen/page';
 import '../../../cssStyling/viewSharedTrivias.css';
 import '../../../cssStyling/playTrivia.css';
 
 const COLORS = EDIT_TRIVIA_LIMITS.COLORS;
 
-export default function PlayTriviaPage() {
+export default function PlayTriviaPage({ id, onClose }: TriviaParams) {
     const router = useRouter();
-    const params = useParams() as TriviaParams;
-    const id = params.id;
 
     // Title and trivia content loaded from DB
     const [triviaTitle, setTriviaTitle] = useState<string>('');
@@ -290,7 +288,7 @@ export default function PlayTriviaPage() {
     return (
         <div className="dashboard-container">
             {gameOver ? (
-                <TriviaEndScreen players={players} triviaId={id} />
+                <TriviaEndScreen players={players} />
             ) : (
                 <>
                     <h1 className="dashboard-title">{triviaTitle}</h1>
@@ -305,10 +303,7 @@ export default function PlayTriviaPage() {
                         >
                             {BUTTON_LABELS.BACK_TO_DASHBOARD}
                         </button>
-                        <button
-                            className="dashboard-back-button"
-                            onClick={() => router.push('../viewSharedTrivias')}
-                        >
+                        <button className="dashboard-back-button" onClick={onClose}>
                             Play a different trivia
                         </button>
                     </div>

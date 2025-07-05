@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import {
@@ -15,10 +14,8 @@ import { ShareRecipient, TriviaParams } from '@/app/interfaces/triviaTypes';
 import '../../../cssStyling/shareTrivia.css';
 import ProfilePicture from '@/app/components/ProfilePicture';
 
-export default function ShareTriviaPage() {
-    const router = useRouter();
-    const params = useParams() as TriviaParams;
-    const triviaid = params.id;
+
+export default function ShareTrivia({ id, onClose }: TriviaParams) {
 
     const [triviaTitle, setTriviaTitle] = useState<string>('');
     const [query, setQuery] = useState('');
@@ -28,10 +25,10 @@ export default function ShareTriviaPage() {
 
     // Load trivia title when page opens (we need it for display + user feedback)
     useEffect(() => {
-        if (!triviaid) return;
+        if (!id) return;
 
         async function fetchTitle() {
-            const { trivia, error } = await getTriviaById(triviaid);
+            const { trivia, error } = await getTriviaById(id);
             if (!error && trivia) {
                 setTriviaTitle(trivia.title);
             } else {
@@ -40,7 +37,7 @@ export default function ShareTriviaPage() {
         }
 
         fetchTitle();
-    }, [triviaid]);
+    }, [id]);
 
     // Live search — triggers on every keystroke in the search bar
     useEffect(() => {
@@ -94,13 +91,13 @@ export default function ShareTriviaPage() {
         }
 
         // Prevent duplicates
-        if (sharedTrivia.includes(triviaid)) {
+        if (sharedTrivia.includes(id)) {
             setShareStatus(`"${triviaTitle}" was already shared with ${user.username}`);
             return;
         }
 
         // Add this trivia to their list and update Supabase
-        const updatedTriviaList = [...sharedTrivia, triviaid];
+        const updatedTriviaList = [...sharedTrivia, id];
         const success = await updateTriviaSharedWithUser(user.id, updatedTriviaList);
 
         if (!success) {
@@ -154,7 +151,7 @@ export default function ShareTriviaPage() {
 
                     <button
                         className="share-button-container share-back-button"
-                        onClick={() => router.push('../dashboard')}
+                        onClick={onClose}
                     >
                         {BUTTON_LABELS.BACK_TO_DASHBOARD}
                     </button>

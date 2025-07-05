@@ -28,7 +28,7 @@
 
 ## Getting Started
 
-**This project is designed to be accessed and used in a browser at <a href="https://triviashare.netlify.app">https://triviashare.netlify.app</a> and is not intended to be run locally**, but if for some reason you want to run this project locally, follow these steps carefully. 
+**This project is designed to be accessed and viewed in a browser at <a href="https://triviashare.netlify.app">https://triviashare.netlify.app</a> and is not intended to be run locally**, but if for some reason you want to run this project locally, follow these steps carefully. 
 This project depends on a Supabase backend, so you will need to:
 
 ### 1. Set up Supabase

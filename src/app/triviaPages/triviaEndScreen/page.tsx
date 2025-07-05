@@ -9,12 +9,11 @@ import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
 interface TriviaEndScreenProps {
     players: TPlayer[];
-    triviaId: string;
 }
 
 const TEMP_REROUTE_PATH = '../dashboard';
 
-export default function TriviaEndScreen({ players, triviaId }: TriviaEndScreenProps) {
+export default function TriviaEndScreen({ players }: TriviaEndScreenProps) {
     const router = useRouter();
     const { winners } = getWinners(players);
 

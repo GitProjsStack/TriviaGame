@@ -290,7 +290,7 @@ export default function PlayTriviaPage() {
     return (
         <div className="dashboard-container">
             {gameOver ? (
-                <TriviaEndScreen players={players} triviaId={id} />
+                <TriviaEndScreen players={players} />
             ) : (
                 <>
                     <h1 className="dashboard-title">{triviaTitle}</h1>

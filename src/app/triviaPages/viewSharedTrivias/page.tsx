@@ -9,7 +9,7 @@ import {
   generateUSERProfilePicSignedUrl,
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import { SharedTrivia } from '@/app/interfaces/triviaTypes';
-import PlayTriviaPage from '../playTrivia/page';
+import PlayTriviaPage from '../playTrivia/PlayTrivia';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
 export default function ViewSharedTrivias() {

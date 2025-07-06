@@ -26,7 +26,7 @@ import TriviaEndScreen from '../triviaEndScreen/page';
 
 const COLORS = EDIT_TRIVIA_LIMITS.COLORS;
 
-export default function PlayTriviaPage({ id, onClose }: TriviaParams) {
+export default function PlayTrivia({ id, onClose }: TriviaParams) {
     const router = useRouter();
 
     // Title and trivia content loaded from DB

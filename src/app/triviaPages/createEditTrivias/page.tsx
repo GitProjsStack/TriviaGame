@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import EditTrivia from '../edit/page';
-import ShareTrivia from '../shareTrivia/page';
+import EditTrivia from '../edit/EditTrivia';
+import ShareTrivia from '../shareTrivia/ShareTrivia';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 import {
   getAuthenticatedUser,

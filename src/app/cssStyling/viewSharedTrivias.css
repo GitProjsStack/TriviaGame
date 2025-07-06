@@ -167,17 +167,6 @@
   animation: spin 1s linear infinite;
 }
 
-/* Mini spinner for Play button */
-.mini-spinner {
-  border: 3px solid #fcd34d;
-  border-top: 3px solid #f97316;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  animation: spin 0.6s linear infinite;
-  margin: 0 auto;
-}
-
 /* Animation keyframes */
 @keyframes spin {
   to {

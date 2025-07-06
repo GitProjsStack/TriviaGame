@@ -149,7 +149,7 @@ export default function EditTrivia({ id, onClose }: TriviaParams) {
 
     const deleteCategory = async (category: string) => {
         if (!trivia) return;
-        const { [category]: _, ...rest } = trivia.content;
+        const { [category]: _unused, ...rest } = trivia.content;
         const updated = { ...trivia, content: rest };
         setTrivia(updated);
 

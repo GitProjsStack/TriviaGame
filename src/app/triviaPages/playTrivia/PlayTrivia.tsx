@@ -22,7 +22,7 @@ import {
     isStealOver,
     evaluateStealAnswer,
 } from '@/app/components/stealQuestionImplementation';
-import TriviaEndScreen from '../triviaEndScreen/page';
+import TriviaEndScreen from '../triviaEndScreen/TriviaEndScreen';
 
 const COLORS = EDIT_TRIVIA_LIMITS.COLORS;
 

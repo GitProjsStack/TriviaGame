@@ -297,7 +297,7 @@ export default function PlayTriviaPage({ id, onClose }: TriviaParams) {
                     <div className="button-row">
                         <button
                             className="dashboard-back-button"
-                            onClick={() => router.push('../dashboard')}
+                            onClick={() => router.push('./dashboard')}
                         >
                             {BUTTON_LABELS.BACK_TO_DASHBOARD}
                         </button>

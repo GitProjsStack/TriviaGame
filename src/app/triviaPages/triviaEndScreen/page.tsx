@@ -17,7 +17,7 @@ export default function TriviaEndScreen({ players }: TriviaEndScreenProps) {
     const isTie = winners.length > 1;
 
     function goToDashboard() {
-        router.push('../dashboard');
+        router.push('./dashboard');
     }
 
     return (

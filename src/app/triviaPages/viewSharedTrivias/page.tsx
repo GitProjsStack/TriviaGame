@@ -109,12 +109,7 @@ export default function ViewSharedTrivias() {
               <div className="trivia-right">
                 <button
                   className="rounded-btn play"
-                  onClick={() => {
-                    setPlayLoadingId(triviaId);
-                    setTimeout(() => {
-                      setPlayingTriviaId(triviaId); // NOT router.push
-                    }, 1000);
-                  }}
+                  onClick={() => setPlayingTriviaId(triviaId)}
                 >
                   {playLoadingId === triviaId ? <div className="mini-spinner" /> : '▶ Play'}
                 </button>

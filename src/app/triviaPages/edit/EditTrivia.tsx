@@ -149,7 +149,12 @@ export default function EditTrivia({ id, onClose }: TriviaParams) {
 
     const deleteCategory = async (category: string) => {
         if (!trivia) return;
-        const { [category]: _unused, ...rest } = trivia.content;
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [category]: _, ...rest } = trivia.content;
+        // We are disabling one rule of eslint so that we can assign an unused _ 
+        // This prevents the prod cmd 'npm run build' from giving us this error
+
         const updated = { ...trivia, content: rest };
         setTrivia(updated);
 

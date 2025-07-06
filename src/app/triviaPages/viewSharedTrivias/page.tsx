@@ -18,33 +18,32 @@ export default function ViewSharedTrivias() {
   const [loading, setLoading] = useState(true);
   const [playingTriviaId, setPlayingTriviaId] = useState<string | null>(null);
 
-  const fetchSharedTrivias = async () => {
-    setLoading(true);
-    const user = await getAuthenticatedUser();
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    const data = await getSharedTriviasWithSharerInfo(user.id);
-
-    // Get signed profile picture URLs (if user uploaded one)
-    const updatedData = await Promise.all(
-      data.map(async (trivia) => {
-        if (trivia.sharerProfilePicUrl) {
-          const signedUrl = await generateUSERProfilePicSignedUrl(trivia.sharerProfilePicUrl, 60 * 60); // 1 hour expiry
-          return { ...trivia, sharerProfilePicUrl: signedUrl };
-        }
-        return trivia;
-      })
-    );
-
-    setSharedTrivias(updatedData);
-    setLoading(false);
-  };
-
   useEffect(() => {
+    const fetchSharedTrivias = async () => {
+      setLoading(true);
+      const user = await getAuthenticatedUser();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+      const data = await getSharedTriviasWithSharerInfo(user.id);
+
+      const updatedData = await Promise.all(
+        data.map(async (trivia) => {
+          if (trivia.sharerProfilePicUrl) {
+            const signedUrl = await generateUSERProfilePicSignedUrl(trivia.sharerProfilePicUrl, 60 * 60);
+            return { ...trivia, sharerProfilePicUrl: signedUrl };
+          }
+          return trivia;
+        })
+      );
+
+      setSharedTrivias(updatedData);
+      setLoading(false);
+    };
+
     fetchSharedTrivias();
-  }, []);
+  }, [router]);
 
   const handleDelete = async (triviaId: string) => {
     const user = await getAuthenticatedUser();
@@ -110,7 +109,7 @@ export default function ViewSharedTrivias() {
                   className="rounded-btn play"
                   onClick={() => setPlayingTriviaId(triviaId)}
                 >
-                  ▶ Play'
+                  ▶ Play
                 </button>
                 <button
                   className="rounded-btn delete"

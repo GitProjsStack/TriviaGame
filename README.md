@@ -11,7 +11,7 @@
 </p>
 
 ---
-> **Note:** This project is maintained under the GitHub account [GitProjsStack](https://github.com/GitProjsStack), which I created to centralize all my side projects.  
+> **Note:** This project is maintained under the GitHub account [GitProjsStack](https://github.com/GitProjsStack), which I created to centralize all my side projects.
 > Some earlier commits were authored as **Ethan-bro**, an alternative developer identity I’ve used personally.  
 > Moving forward, all commits will be made under **GitProjsStack** for consistency and clarity.
 ---

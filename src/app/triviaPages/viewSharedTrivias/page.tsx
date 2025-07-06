@@ -9,7 +9,7 @@ import {
   generateUSERProfilePicSignedUrl,
 } from '@/app/supabasefuncs/helperSupabaseFuncs';
 import { SharedTrivia } from '@/app/interfaces/triviaTypes';
-import PlayTriviaPage from '../playTrivia/PlayTrivia';
+import PlayTrivia from '../playTrivia/PlayTrivia';
 import { BUTTON_LABELS } from '@/app/constants/gameSettings';
 
 export default function ViewSharedTrivias() {
@@ -62,7 +62,7 @@ export default function ViewSharedTrivias() {
   if (playingTriviaId) {
     return (
       <div className="dashboard-container">
-        <PlayTriviaPage id={playingTriviaId} onClose={() => setPlayingTriviaId(null)} />
+        <PlayTrivia id={playingTriviaId} onClose={() => setPlayingTriviaId(null)} />
       </div>
     );
   }
